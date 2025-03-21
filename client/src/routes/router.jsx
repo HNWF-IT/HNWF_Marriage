@@ -6,8 +6,6 @@ import {
 import Login from "../components/login/Login";
 import Layout from "../components/commons/Layout";
 import CandidateDashboard from "../components/candidate/CandidateDashboard";
-import CandidateProfile from "../components/candidate/CandidateProfile";
-import CandidatesDisplay from "../components/candidate/CandidateDisplay";
 import Dashboard from "../components/dashboard/Dashboard";
 import isLoggedIn from "../utils";
 import Library from "../components/library/Library";
@@ -20,8 +18,6 @@ if (isLoggedIn()) {
       <Route path="login" element={<Login />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="marriage" element={<CandidateDashboard />} />
-      <Route path="candidateProfile" element={<CandidateProfile />} />
-      <Route path="can" element={<CandidatesDisplay />} />
       <Route path="library" element={<Library />} />
     </Route>
   </>
