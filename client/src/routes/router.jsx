@@ -6,8 +6,6 @@ import {
 import Login from "../components/login/Login";
 import Layout from "../components/commons/Layout";
 import CandidateDashboard from "../components/candidate/CandidateDashboard";
-import CandidateProfile from "../components/candidate/CandidateProfile";
-import CandidatesDisplay from "../components/candidate/CandidateDisplay";
 import Dashboard from "../components/dashboard/Dashboard";
 import isLoggedIn from "../utils";
 import Library from "../components/library/Library";

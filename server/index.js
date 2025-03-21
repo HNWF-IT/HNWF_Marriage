@@ -1,8 +1,8 @@
 const cors = require("cors");
-const PORT = process.env.PORT || 8000;
 
 // use .env files
 require("dotenv").config();
+const PORT = process.env.PORT || 8000;
 
 // Initialize DB connection
 require("./db")({ connectToDb: true, initializeSeederFile: false });
