@@ -12,14 +12,13 @@ import Library from "../components/library/Library";
 
 let ROUTES = <></>;
 
-if (isLoggedIn()) {
+// if (isLoggedIn()) {
+  if (true) {
   ROUTES = <>
     <Route path="/" element={<Layout />}>
       <Route path="login" element={<Login />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="marriage" element={<CandidateDashboard />} />
-      <Route path="candidateProfile" element={<CandidateProfile />} />
-      <Route path="can" element={<CandidatesDisplay />} />
       <Route path="library" element={<Library />} />
     </Route>
   </>
