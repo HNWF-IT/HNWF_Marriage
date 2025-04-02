@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import MyNavbar from "./MyNavbar"; // Import the new component
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "../../assets/css/candidateStyle.css"
 
 const MainContent = () => {
   const [activeMainTabIndex, setActiveMainTabIndex] = useState(0);
