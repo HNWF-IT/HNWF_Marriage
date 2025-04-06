@@ -1,80 +1,97 @@
 const express = require('express');
 const router = express.Router();
-const Candidate = require('../models/candidate'); // Assuming candidate.js is in the models folder
+const Candidate = require('../models/candidate');
 
 // Create a new candidate
-router.post('/create', (req, res) => {
-  // Create a new candidate
-  const newCandidate = new Candidate({ ...req.body });
+router.post('/create', async (req, res) => {
+  try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ success: false, message: 'Missing candidate data', data: {} });
+    }
 
-  newCandidate.save()
-    .then((candidate) => {
-      res.status(201).json({ success: true, message: 'Candidate created successfully', data: candidate });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: true, message: 'Error creating candidate', data: err });
-    });
+    const newCandidate = new Candidate({ ...req.body });
+    const candidate = await newCandidate.save();
+
+    res.status(201).json({ success: true, message: 'Candidate created successfully', data: candidate });
+  } catch (err) {
+    res.status(400).json({ success: false, message: 'Error creating candidate', data: err });
+  }
 });
 
 // Get all candidates with optional filters
 router.post('/list', async (req, res) => {
-  const filters = req.body.filters;
-
   try {
+    const filters = req.body?.filters || {};
     const candidates = await Candidate.find(filters);
+
     res.status(200).json({ success: true, message: 'Candidates returned successfully', data: candidates });
   } catch (err) {
-    res.status(400).json({ success: false, message: 'Error fetching candidates', data: {} });
+    res.status(400).json({ success: false, message: 'Error fetching candidates', data: err });
   }
 });
 
 // Get a candidate by ID
-router.get('/get/:id', (req, res) => {
-  const { id } = req.params;
+router.get('/get/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Missing candidate ID', data: {} });
+    }
 
-  Candidate.findById(id)
-    .then((candidate) => {
-      if (!candidate) {
-        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
-      }
-      res.status(200).json(candidate);
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: 'Error fetching candidate', data: err });
-    });
+    const candidate = await Candidate.findById(id);
+    if (!candidate) {
+      return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
+    }
+
+    res.status(200).json({ success: true, message: 'Candidate fetched', data: candidate });
+  } catch (err) {
+    res.status(400).json({ success: false, message: 'Error fetching candidate', data: err });
+  }
 });
 
 // Update a candidate by ID
-router.put('/update/:id', (req, res) => {
-  const { id } = req.params;
-  const { name, email, phoneNumber, education } = req.body;
+router.put('/update/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id || !req.body) {
+      return res.status(400).json({ success: false, message: 'Missing ID or update data', data: {} });
+    }
 
-  Candidate.findByIdAndUpdate(id, { name, email, phoneNumber, education }, { new: true })
-    .then((updatedCandidate) => {
-      if (!updatedCandidate) {
-        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
-      }
-      res.status(200).json({ success: true, message: 'Candidate updated successfully', data: updatedCandidate });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: 'Error updating candidate', data: err });
+    const updateData = {};
+    const fields = ['name', 'email', 'phoneNumber', 'education'];
+    fields.forEach(field => {
+      if (req.body[field] != null) updateData[field] = req.body[field];
     });
+
+    const updatedCandidate = await Candidate.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!updatedCandidate) {
+      return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
+    }
+
+    res.status(200).json({ success: true, message: 'Candidate updated successfully', data: updatedCandidate });
+  } catch (err) {
+    res.status(400).json({ success: false, message: 'Error updating candidate', data: err });
+  }
 });
 
 // Delete a candidate by ID
-router.delete('/delete/:id', (req, res) => {
-  const { id } = req.params;
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Missing candidate ID', data: {} });
+    }
 
-  Candidate.findByIdAndDelete(id)
-    .then((deletedCandidate) => {
-      if (!deletedCandidate) {
-        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
-      }
-      res.status(200).json({ success: true, message: 'Candidate deleted successfully', data: deletedCandidate });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: 'Error deleting candidate', data: err });
-    });
+    const deletedCandidate = await Candidate.findByIdAndDelete(id);
+    if (!deletedCandidate) {
+      return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
+    }
+
+    res.status(200).json({ success: true, message: 'Candidate deleted successfully', data: deletedCandidate });
+  } catch (err) {
+    res.status(400).json({ success: false, message: 'Error deleting candidate', data: err });
+  }
 });
 
 module.exports = router;
