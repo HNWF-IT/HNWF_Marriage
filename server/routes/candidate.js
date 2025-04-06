@@ -9,23 +9,22 @@ router.post('/create', (req, res) => {
 
   newCandidate.save()
     .then((candidate) => {
-      res.status(201).json({ message: 'Candidate created successfully', candidate });
+      res.status(201).json({ success: true, message: 'Candidate created successfully', data: candidate });
     })
     .catch((err) => {
-      res.status(400).json({ message: 'Error creating candidate', error: err });
+      res.status(400).json({ success: true, message: 'Error creating candidate', data: err });
     });
 });
 
 // Get all candidates with optional filters
 router.post('/list', async (req, res) => {
-  console.log(res.user, "res.user")
   const filters = req.body.filters;
 
   try {
     const candidates = await Candidate.find(filters);
-    res.json(candidates);
+    res.status(200).json({ success: true, message: 'Candidates returned successfully', data: candidates });
   } catch (err) {
-    res.status(400).json({ message: 'Error fetching candidates' });
+    res.status(400).json({ success: false, message: 'Error fetching candidates', data: {} });
   }
 });
 
@@ -36,12 +35,12 @@ router.get('/get/:id', (req, res) => {
   Candidate.findById(id)
     .then((candidate) => {
       if (!candidate) {
-        return res.status(404).json({ message: 'Candidate not found' });
+        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
       }
       res.status(200).json(candidate);
     })
     .catch((err) => {
-      res.status(400).json({ message: 'Error fetching candidate', error: err });
+      res.status(400).json({ success: false, message: 'Error fetching candidate', data: err });
     });
 });
 
@@ -53,12 +52,12 @@ router.put('/update/:id', (req, res) => {
   Candidate.findByIdAndUpdate(id, { name, email, phoneNumber, education }, { new: true })
     .then((updatedCandidate) => {
       if (!updatedCandidate) {
-        return res.status(404).json({ message: 'Candidate not found' });
+        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
       }
-      res.status(200).json({ message: 'Candidate updated successfully', updatedCandidate });
+      res.status(200).json({ success: true, message: 'Candidate updated successfully', data: updatedCandidate });
     })
     .catch((err) => {
-      res.status(400).json({ message: 'Error updating candidate', error: err });
+      res.status(400).json({ success: false, message: 'Error updating candidate', data: err });
     });
 });
 
@@ -69,12 +68,12 @@ router.delete('/delete/:id', (req, res) => {
   Candidate.findByIdAndDelete(id)
     .then((deletedCandidate) => {
       if (!deletedCandidate) {
-        return res.status(404).json({ message: 'Candidate not found' });
+        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
       }
-      res.status(200).json({ message: 'Candidate deleted successfully' });
+      res.status(200).json({ success: true, message: 'Candidate deleted successfully', data: deletedCandidate });
     })
     .catch((err) => {
-      res.status(400).json({ message: 'Error deleting candidate', error: err });
+      res.status(400).json({ success: false, message: 'Error deleting candidate', data: err });
     });
 });
 
