@@ -3,7 +3,7 @@ import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
-import { Education, Gender, HouseOwnership, MaritalStatus, MuslimStatus, Nationality, SectType } from '../../enums/candidateFormEnums';
+import { Education, Gender, HouseOwnership, MaritalStatus, MuslimStatus, Nationality, SectType } from '../../enums/candidateEnums';
 
 const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAddOrUpdate }) => {
   console.log("Candidate Data: ", candidateData);
