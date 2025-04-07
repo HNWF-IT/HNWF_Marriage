@@ -55,7 +55,7 @@
   box-shadow: 0 0 10px currentColor;
 }
 
-.wormhole-message {
+.loader-message {
   color: #fff;
   font-family: 'Segoe UI', sans-serif;
   font-size: 1.1rem;
@@ -109,15 +109,6 @@
   border-radius: 50%;
   animation: pulse 1.4s infinite;
   transform-origin: center;
-}
-
-.pulse-loader-message {
-  color: #555;
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 1rem;
-  text-align: center;
-  margin-top: 10px;
-  max-width: 80%;
 }
 
 @keyframes pulse {

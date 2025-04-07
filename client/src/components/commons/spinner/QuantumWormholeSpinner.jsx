@@ -15,7 +15,7 @@ const QuantumWormholeSpinner = ({ message = "Loading data..." }) => {
           />
         ))}
       </div>
-      <p className="wormhole-message">{message}</p>
+      <p className="loader-message">{message}</p>
     </div>
   );
 };

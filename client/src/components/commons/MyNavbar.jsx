@@ -1,7 +1,7 @@
 import React from "react";
 import { Navbar, Container, Nav, Form, Button } from "react-bootstrap";
 
-const MyNavbar = ({ toggleSidebar, isMobile, colors }) => {
+const MyNavbar = ({ toggleSidebar, isMobile, colors, onLogout }) => {
   return (
     <Navbar expand="lg" style={{ backgroundColor: colors.white }} className="border-bottom shadow-sm">
       <Container fluid>
@@ -19,6 +19,9 @@ const MyNavbar = ({ toggleSidebar, isMobile, colors }) => {
               <Nav className="me-auto">
                 <Nav.Link style={{ color: colors.text }}>Profile</Nav.Link>
                 <Nav.Link style={{ color: colors.text }}>Settings</Nav.Link>
+                <Nav.Link style={{ color: colors.text }} onClick={onLogout}>
+                  Logout
+                </Nav.Link>
               </Nav>
             </Navbar.Collapse>
           </>
@@ -36,6 +39,9 @@ const MyNavbar = ({ toggleSidebar, isMobile, colors }) => {
             <Nav className="ms-auto">
               <Nav.Link style={{ color: colors.text }}>Profile</Nav.Link>
               <Nav.Link style={{ color: colors.text }}>Settings</Nav.Link>
+              <Nav.Link style={{ color: colors.text }} onClick={onLogout}>
+                  Logout
+                </Nav.Link>
             </Nav>
           </>
         )}

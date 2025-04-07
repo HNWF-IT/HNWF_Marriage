@@ -5,15 +5,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
 import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
-// import "../../assets/css/candidateStyle.css"
-
-import { 
-  PeopleFill, 
-  HeartFill, 
-  PersonCheckFill 
-} from 'react-bootstrap-icons';
 import CandidateStatsCard from './CandidateStatsCard';
-import QuantumWormholeSpinner from '../commons/spinner/QuantumWormholeSpinner';
+import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
@@ -35,7 +28,6 @@ const CandidateDashboard = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2500));
       try {
         const response = await CandidateAPI.getAllCandidates();
         setCandidates(response.data);
@@ -43,6 +35,7 @@ const CandidateDashboard = () => {
         const message = error?.message || "Something went wrong";
         toast.error(message);
       } finally {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setLoading(false);
       }
     };
@@ -118,8 +111,16 @@ const CandidateDashboard = () => {
     return age;
   };
 
-  const handleCandidateAdded = (newCandidate) => {
-    setCandidates((prev) => [...prev, newCandidate]); // Update the state
+  const handleCandidateAddOrUpdate = (newCandidate, mode) => {
+    if(mode === "add") {
+      setCandidates((prev) => [...prev, newCandidate]); // Update the state
+    } else if(mode === "edit") {
+      setCandidates(prevCandidates =>
+        prevCandidates.map(candidate =>
+          candidate._id === newCandidate._id ? newCandidate : candidate
+        )
+      );
+    }
   };
 
   return (
@@ -129,7 +130,7 @@ const CandidateDashboard = () => {
         candidateData={selectedCandidate}
         show={showModal}
         handleClose={handleClose}
-        onCandidateAdded={handleCandidateAdded}
+        onCandidateAddOrUpdate={handleCandidateAddOrUpdate}
       /> : ""}
 
       <Container fluid className="p-4 bg-light min-vh-100">
@@ -293,7 +294,7 @@ const CandidateDashboard = () => {
             </Collapse>
 
             { loading ? 
-              (<QuantumWormholeSpinner />) : 
+              (<PulseDotLoader />) : 
               (<>
                 <div className="table-responsive">
                   <Table hover className="align-middle">

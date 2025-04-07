@@ -5,6 +5,8 @@ import MyNavbar from "./MyNavbar"; // Import the new component
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../../assets/css/candidateStyle.css"
+import isLoggedIn from "../../utils";
+import Login from "../login/Login";
 
 const MainContent = () => {
   const [activeMainTabIndex, setActiveMainTabIndex] = useState(0);
@@ -33,34 +35,43 @@ const MainContent = () => {
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
+  const handleLogout = () => {
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+    window.location.pathname = "/login"
+  }
+
   return (
     <>
-      <ToastContainer position="top-right" autoClose={5000} />
-      <div className="d-flex">
-        <Sidebar
-          activeMainTabIndex={activeMainTabIndex}
-          setActiveMainTabIndex={setActiveMainTabIndex}
-          sidebarOpen={sidebarOpen}
-          toggleSidebar={toggleSidebar}
-          colors={colors}
-          isMobile={isMobile}
-        />
-
-        {/* Main Content */}
-        <div
-          style={{
-            marginLeft: isMobile ? "0px" : sidebarOpen ? "250px" : "70px",
-            transition: "all 0.3s",
-            width: isMobile ? "100%" : sidebarOpen ? "calc(100% - 250px)" : "calc(100% - 70px)",
-          }}
-        >
-          {/* ✅ Using Navbar Here */}
-          <MyNavbar toggleSidebar={toggleSidebar} isMobile={isMobile} colors={colors} />
+      {!isLoggedIn() ? <Login /> : (
+      <>
+        <ToastContainer position="top-right" autoClose={5000} />
+        <div className="d-flex">
+          <Sidebar
+            activeMainTabIndex={activeMainTabIndex}
+            setActiveMainTabIndex={setActiveMainTabIndex}
+            sidebarOpen={sidebarOpen}
+            toggleSidebar={toggleSidebar}
+            colors={colors}
+            isMobile={isMobile}
+          />
 
           {/* Main Content */}
-          <Outlet />
+          <div
+            style={{
+              marginLeft: isMobile ? "0px" : sidebarOpen ? "250px" : "70px",
+              transition: "all 0.3s",
+              width: isMobile ? "100%" : sidebarOpen ? "calc(100% - 250px)" : "calc(100% - 70px)",
+            }}
+          >
+            {/* ✅ Using Navbar Here */}
+            <MyNavbar toggleSidebar={toggleSidebar} isMobile={isMobile} colors={colors} onLogout={handleLogout} />
+
+            {/* Main Content */}
+            <Outlet />
+          </div>
         </div>
-      </div>
+      </>
+      )}
     </>
   );
 };
