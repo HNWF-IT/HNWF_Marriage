@@ -5,7 +5,7 @@ function validateRequest(req, res, next) {
 
   // if the header is not present
   if (!token) {
-    return res.status(401).json({ success: false, message: "Token missing", data: null });
+    return res.status(401).json({ success: false, message: "Token missing", data: {} });
   }
 
   let userToken = null;
