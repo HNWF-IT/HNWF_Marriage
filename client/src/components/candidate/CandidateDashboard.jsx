@@ -10,6 +10,17 @@ import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
+  useEffect(() => {
+    CandidateAPI.getAllCandidates()
+      .then((response) => {
+        setCandidates(response.data);
+      })
+      .catch((error) => {
+        const message = error?.message || "Something went wrong";
+        toast.error(message);
+      });
+  }, []);
+
   const [filters, setFilters] = useState({
     gender: '',
     minAge: '',
@@ -129,6 +140,7 @@ const CandidateDashboard = () => {
         mode={mode}
         candidateData={selectedCandidate}
         show={showModal}
+        // handleSave={}
         handleClose={handleClose}
         onCandidateAddOrUpdate={handleCandidateAddOrUpdate}
       /> : ""}
@@ -160,8 +172,6 @@ const CandidateDashboard = () => {
                 </Button>
               </div>
             </div>
-            
-            <CandidateStatsCard />
 
             {/* Main Search */}
             <InputGroup className="mb-4">
@@ -350,77 +360,72 @@ const CandidateDashboard = () => {
                           </td>
                           <td>{candidate.muslimStatus}</td>
 
-                          <td>
-                            <Button 
-                              variant="light"
-                              size="sm"
-                              className="me-1"
-                              onClick={() => handleShow('edit', candidate)}
-                            >
-                              <i className="bi bi-pencil"></i>
-                            </Button>
-                            <Button variant="light" size="sm">
-                              <i className="bi bi-three-dots-vertical"></i>
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                      <td>
+                        <Button 
+                          variant="light"
+                          size="sm"
+                          className="me-1"
+                          onClick={() => handleShow('edit', candidate)}
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </Button>
+                        <Button variant="light" size="sm">
+                          <i className="bi bi-three-dots-vertical"></i>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
 
-                  {currentPageCandidates?.length === 0 && (
-                    <div className="text-center py-5">
-                      <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
-                      <p className="text-muted mb-0">No candidates found matching your search.</p>
-                    </div>
-                  )}
+              {currentPageCandidates?.length === 0 && (
+                <div className="text-center py-5">
+                  <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
+                  <p className="text-muted mb-0">No candidates found matching your search.</p>
                 </div>
+              )}
+            </div>
 
-                <Row className="d-flex justify-content-between">
-                <Col className="text-center">
-                <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
-                    Prev
-                  </Button>
-                </Col>
-
-                <Col className="text-center">
-                <Pagination className="justify-content-center custom-pagination">
-                    <Pagination.Prev
-                      onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-                      disabled={currentPage === 1}
-                    />
-                    {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
-                      <Pagination.Item
-                        key={number + 1}
-                        active={number + 1 === currentPage}
-                        onClick={() => {
-                          setCurrentPage(number + 1);
-                          paginate(number + 1);
-                        }}
-                      >
-                        {number + 1}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
-                        )
-                      }
-                      disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
-                    />
-                  </Pagination>
-                </Col>
-
-                <Col className="text-center">
-                  <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
-                    Next
-                  </Button>
-                </Col>
-                </Row>
-              </>
-            )}
-
+            <Row className="d-flex justify-content-between">
+              <Col>
+                {/* Button on the left side */}
+                <Button variant="primary">
+                  Prev
+                </Button>
+              </Col>
+              <Col>
+                {/* Pagination on the right side */}
+                <Pagination>
+                  <Pagination.Prev
+                    onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
+                    disabled={currentPage === 1}
+                  />
+                  {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
+                    <Pagination.Item
+                      key={number + 1}
+                      active={number + 1 === currentPage}
+                      onClick={() => paginate(number + 1)}
+                    >
+                      {number + 1}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
+                      )
+                    }
+                    disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
+                  />
+                </Pagination>
+              </Col>
+              <Col>
+                {/* Button on the left side */}
+                <Button variant="primary">
+                  Next
+                </Button>
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       </Container>

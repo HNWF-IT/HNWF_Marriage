@@ -21,7 +21,6 @@ const candidateSchema = new mongoose.Schema({
   },
   dob: { type: Date, required: true },
   height: { type: String, required: true },
-  incomeAmount: { type: String, required: true },
   sourceOfIncome: { type: String, required: true },
   qualification: { 
     type: String, 
@@ -48,11 +47,10 @@ const candidateSchema = new mongoose.Schema({
   careOfContact: { type: String, required: true },
   nationality: { 
     type: String, 
-    enum: ["Pakistani", "Oversea Pakistani", "Foriegner"], 
+    enum: ["Pakistani", "Non-Pakistani"], 
     required: true 
   },
   city: { type: String, required: true },
-  areaOfResidence: { type: String, required: true },
   address: { type: String, required: true },
 });
 
