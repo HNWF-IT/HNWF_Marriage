@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination, Badge } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
@@ -339,7 +339,11 @@ const CandidateDashboard = () => {
                       {currentPageCandidates?.map((candidate, index) => ( 
                         <tr key={candidate.id}>
                           <td>{index + 1}</td>
-                          <td>{candidate.gender}</td>
+                          <td>
+                          <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
+                            {candidate.gender}
+                          </Badge>
+                          </td>
                           <td>{calculateAge(candidate.dob)}</td>
                           <td>{candidate.maritalStatus}</td>
                           <td>{candidate.maslak}</td>
