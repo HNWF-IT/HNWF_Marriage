@@ -8,20 +8,20 @@ router.post("/login", async (req, res) => {
   const { email, password, rememberMe } = req.body;
 
   if (!email || !password || typeof rememberMe != 'boolean') {
-    return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe" });
+    return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
   }
 
   try {
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid credentials", data: null });
+      return res.status(400).json({ success: false, message: "Invalid credentials", data: {} });
     }
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Invalid credentials", data: null });
+      return res.status(400).json({ success: false, message: "Invalid credentials", data: {} });
     }
 
     // Generate JWT token
@@ -38,14 +38,14 @@ router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Missing email or password" });
+    return res.status(400).json({ success: false, message: "Missing email or password", data: {} });
   }
 
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists" });
+      return res.status(400).json({ success: false, message: "User already exists", data: {} });
     }
 
     // Hash password
@@ -55,9 +55,9 @@ router.post("/signup", async (req, res) => {
     const newUser = new User({ email, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json({ success: true, message: "User created successfully" });
+    res.status(201).json({ success: true, message: "User created successfully", data: newUser });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error", data: {} });
   }
 });
 

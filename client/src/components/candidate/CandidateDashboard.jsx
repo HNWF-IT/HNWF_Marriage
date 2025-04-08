@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination, Badge } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
 import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
+import CandidateStatsCard from './CandidateStatsCard';
+import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
-  useEffect(() => {
-    CandidateAPI.getAllCandidates()
-      .then((response) => {
-        setCandidates(response.data);
-      })
-      .catch((error) => {
-        const message = error?.message || "Something went wrong";
-        toast.error(message);
-      });
-  }, []);
-
   const [filters, setFilters] = useState({
     gender: '',
     minAge: '',
@@ -33,6 +24,26 @@ const CandidateDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState({});
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      setLoading(true);
+      try {
+        const response = await CandidateAPI.getAllCandidates();
+        if(response.data.success && response.data.data) {
+          setCandidates(response.data.data);
+        }
+      } catch (error) {
+        const message = error?.message || "Something went wrong";
+        toast.error(message);
+      } finally {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setLoading(false);
+      }
+    };
+  
+    fetchCandidates();
+  }, []);
 
   const filteredCandidates = candidates?.filter(candidate => {
     return (
@@ -102,15 +113,27 @@ const CandidateDashboard = () => {
     return age;
   };
 
+  const handleCandidateAddOrUpdate = (newCandidate, mode) => {
+    if(mode === "add") {
+      setCandidates((prev) => [...prev, newCandidate]); // Update the state
+    } else if(mode === "edit") {
+      setCandidates(prevCandidates =>
+        prevCandidates.map(candidate =>
+          candidate._id === newCandidate._id ? newCandidate : candidate
+        )
+      );
+    }
+  };
+
   return (
     <>
-      <CandidateModal
+      { showModal ? <CandidateModal
         mode={mode}
         candidateData={selectedCandidate}
         show={showModal}
-        // handleSave={}
         handleClose={handleClose}
-      />
+        onCandidateAddOrUpdate={handleCandidateAddOrUpdate}
+      /> : ""}
 
       <Container fluid className="p-4 bg-light min-vh-100">
         <Card className="border-0 shadow-sm">
@@ -139,6 +162,8 @@ const CandidateDashboard = () => {
                 </Button>
               </div>
             </div>
+            
+            <CandidateStatsCard />
 
             {/* Main Search */}
             <InputGroup className="mb-4">
@@ -270,126 +295,138 @@ const CandidateDashboard = () => {
               </div>
             </Collapse>
 
-            <div className="table-responsive">
-              <Table hover className="align-middle">
-                <thead className="bg-light">
-                  <tr>
-                    <th style={{ cursor: 'pointer' }}>
-                      Sr#
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Gender
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Age 
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Marital Status
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Maslak
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Caste
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Qualification
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Health Condition
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Location
-                    </th>
-                    <th style={{ cursor: 'pointer' }}>
-                      Muslim Status
-                    </th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentPageCandidates?.map((candidate, index) => ( 
-                    <tr key={candidate.id}>
-                      <td>{index + 1}</td>
-                      <td>{candidate.gender}</td>
-                      <td>{calculateAge(candidate.dob)}</td>
-                      <td>{candidate.maritalStatus}</td>
-                      <td>{candidate.maslak}</td>
-                      <td>{candidate.caste}</td>
-                      <td>{candidate.qualification}</td>
-                      <td>{candidate.healthCondition}</td>
-                      <td>
-                        <i className="bi bi-geo-alt me-1"></i>
-                        {candidate.city}
-                      </td>
-                      <td>{candidate.muslimStatus}</td>
+            { loading ? 
+              (<PulseDotLoader />) : 
+              (<>
+                <div className="table-responsive">
+                  <Table hover className="align-middle">
+                    <thead className="bg-light">
+                      <tr key="head">
+                        <th style={{ cursor: 'pointer' }}>
+                          Sr#
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Gender
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Age 
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Marital Status
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Maslak
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Caste
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Qualification
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Health Condition
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Location
+                        </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Muslim Status
+                        </th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentPageCandidates?.map((candidate, index) => ( 
+                        <tr key={candidate.id}>
+                          <td>{index + 1}</td>
+                          <td>
+                          <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
+                            {candidate.gender}
+                          </Badge>
+                          </td>
+                          <td>{calculateAge(candidate.dob)}</td>
+                          <td>{candidate.maritalStatus}</td>
+                          <td>{candidate.maslak}</td>
+                          <td>{candidate.caste}</td>
+                          <td>{candidate.qualification}</td>
+                          <td>{candidate.healthCondition}</td>
+                          <td>
+                            <i className="bi bi-geo-alt me-1"></i>
+                            {candidate.city}
+                          </td>
+                          <td>{candidate.muslimStatus}</td>
 
-                      <td>
-                        <Button 
-                          variant="light"
-                          size="sm"
-                          className="me-1"
-                          onClick={() => handleShow('edit', candidate)}
-                        >
-                          <i className="bi bi-pencil"></i>
-                        </Button>
-                        <Button variant="light" size="sm">
-                          <i className="bi bi-three-dots-vertical"></i>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                          <td>
+                            <Button 
+                              variant="light"
+                              size="sm"
+                              className="me-1"
+                              onClick={() => handleShow('edit', candidate)}
+                            >
+                              <i className="bi bi-pencil"></i>
+                            </Button>
+                            <Button variant="light" size="sm">
+                              <i className="bi bi-three-dots-vertical"></i>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
 
-              {currentPageCandidates?.length === 0 && (
-                <div className="text-center py-5">
-                  <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
-                  <p className="text-muted mb-0">No candidates found matching your search.</p>
+                  {currentPageCandidates?.length === 0 && (
+                    <div className="text-center py-5">
+                      <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
+                      <p className="text-muted mb-0">No candidates found matching your search.</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <Row className="d-flex justify-content-between">
-              <Col>
-                {/* Button on the left side */}
-                <Button variant="primary">
-                  Prev
-                </Button>
-              </Col>
-              <Col>
-                {/* Pagination on the right side */}
-                <Pagination>
-                  <Pagination.Prev
-                    onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-                    disabled={currentPage === 1}
-                  />
-                  {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
-                    <Pagination.Item
-                      key={number + 1}
-                      active={number + 1 === currentPage}
-                      onClick={() => paginate(number + 1)}
-                    >
-                      {number + 1}
-                    </Pagination.Item>
-                  ))}
-                  <Pagination.Next
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
-                      )
-                    }
-                    disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
-                  />
-                </Pagination>
-              </Col>
-              <Col>
-                {/* Button on the left side */}
-                <Button variant="primary">
-                  Next
-                </Button>
-              </Col>
-            </Row>
+                <Row className="d-flex justify-content-between">
+                <Col className="text-center">
+                <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
+                    Prev
+                  </Button>
+                </Col>
+
+                <Col className="text-center">
+                <Pagination className="justify-content-center custom-pagination">
+                    <Pagination.Prev
+                      onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
+                      disabled={currentPage === 1}
+                    />
+                    {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
+                      <Pagination.Item
+                        key={number + 1}
+                        active={number + 1 === currentPage}
+                        onClick={() => {
+                          setCurrentPage(number + 1);
+                          paginate(number + 1);
+                        }}
+                      >
+                        {number + 1}
+                      </Pagination.Item>
+                    ))}
+                    <Pagination.Next
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
+                        )
+                      }
+                      disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
+                    />
+                  </Pagination>
+                </Col>
+
+                <Col className="text-center">
+                  <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
+                    Next
+                  </Button>
+                </Col>
+                </Row>
+              </>
+            )}
+
           </Card.Body>
         </Card>
       </Container>

@@ -1,0 +1,153 @@
+/* MarriageForm.css */
+
+.form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+.print-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.print-button button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.print-button button:hover {
+    background-color: #2563eb;
+}
+
+.form-wrapper {
+    border: 2px solid black;
+    padding: 20px;
+}
+
+.form-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Header section */
+.header-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.photo-container {
+    width: 130px;
+    height: 130px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    background: #f3f3f3;
+    border-radius: 50%; /* Make the image circular */
+    overflow: hidden;
+}
+
+.header-info {
+    flex: 1;
+    text-align: center;
+    padding-left: 30px;
+}
+
+.date-line {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.subtitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.arabic-text {
+    color: #047857;
+    direction: rtl;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.blessing-text {
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.emoji-container {
+    font-size: 22px;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-bottom: 15px;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 18px;
+}
+
+.info-table tr {
+    border: 1px solid black;
+    height: 40px; /* Increased spacing for clarity */
+}
+
+.label-cell {
+    width: 35%;
+    padding: 12px;
+    font-weight: bold;
+    border: 1px solid black;
+}
+
+.value-cell {
+    width: 65%;
+    padding: 12px;
+    border: 1px solid black;
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: A3 portrait;
+        margin: 15mm;
+    }
+    
+    .print-button {
+        display: none;
+    }
+    
+    .form-container::before {
+        content: "Huqooq un Naas Marriage Form";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 50px;
+        color: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+        white-space: nowrap;
+    }
+}
