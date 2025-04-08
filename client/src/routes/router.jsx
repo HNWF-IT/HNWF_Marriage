@@ -12,8 +12,8 @@ import BookList from "../components/library/BookList";
 
 let ROUTES = <></>;
 
-// if (isLoggedIn()) {
-  if (true) {
+if (isLoggedIn()) {
+  // if (true) {
   ROUTES = <>
     <Route path="/" element={<Layout />}>
       <Route path="login" element={<Login />} />
