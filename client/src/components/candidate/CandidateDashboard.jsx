@@ -30,7 +30,9 @@ const CandidateDashboard = () => {
       setLoading(true);
       try {
         const response = await CandidateAPI.getAllCandidates();
-        setCandidates(response.data);
+        if(response.data.success && response.data.data) {
+          setCandidates(response.data.data);
+        }
       } catch (error) {
         const message = error?.message || "Something went wrong";
         toast.error(message);
