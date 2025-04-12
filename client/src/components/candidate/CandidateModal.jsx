@@ -5,7 +5,7 @@ import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
 import { Education, Gender, HouseOwnership, MaritalStatus, MuslimStatus, Nationality, SectType } from '../../enums/candidateEnums';
 
-const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdded }) => {
+const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAddOrUpdate }) => {
   console.log("Candidate Data: ", candidateData);
 
   const { 
@@ -82,7 +82,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
     if (mode === 'add') {
       CandidateAPI.addCandidate(cand)
         .then((response) => {
-          onCandidateAdded(response.data.candidate);
+          onCandidateAddOrUpdate(response.data.candidate);
           console.log("Response", response);
           toast.success("Candidate added successfully");
           closeModal();
