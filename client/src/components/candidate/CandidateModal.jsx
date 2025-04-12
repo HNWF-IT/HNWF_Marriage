@@ -82,7 +82,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
     if (mode === 'add') {
       CandidateAPI.addCandidate(cand)
         .then((response) => {
-          onCandidateAddOrUpdate(response.data.candidate);
+          onCandidateAddOrUpdate(response.data.data, mode);
           console.log("Response", response);
           toast.success("Candidate added successfully");
           closeModal();
@@ -94,6 +94,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
     } else {
       CandidateAPI.updateCandidate(cand._id, cand)
         .then((response) => {
+          onCandidateAddOrUpdate(response.data.data, mode);
           console.log("Update Response: ", response);
           toast.success("Candidate updated successfully");
           closeModal();

@@ -53,15 +53,15 @@ router.get('/get/:id', async (req, res) => {
 router.put('/update/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id || !req.body) {
-      return res.status(400).json({ success: false, message: 'Missing ID or update data', data: {} });
-    }
+    const updateData = req.body;
 
-    const updateData = {};
-    const fields = ['name', 'email', 'phoneNumber', 'education'];
-    fields.forEach(field => {
-      if (req.body[field] != null) updateData[field] = req.body[field];
-    });
+    if (!id || !updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing ID or update data',
+        data: {},
+      });
+    }
 
     const updatedCandidate = await Candidate.findByIdAndUpdate(id, updateData, { new: true });
 
