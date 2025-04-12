@@ -8,7 +8,9 @@ const headers = {
 };
 
 if (document.cookie) {
-  headers["Authorization"] = document.cookie
+  headers["Authorization"] = document.cookie.split('; ')
+  .find(row => row.startsWith('token='))
+  ?.split('=')[1];
 }
 
 const axiosInstance = axios.create({

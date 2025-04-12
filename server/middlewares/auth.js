@@ -1,11 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 function validateRequest(req, res, next) {
-  const authorizationData = req.headers["Authorization"] || req.headers.authorization;
-  const token = authorizationData
-  .split('; ')
-  .find(row => row.startsWith('token='))
-  ?.split('=')[1];
+  const token = req.headers["Authorization"] || req.headers.authorization;
 
   // if the header is not present
   if (!token) {
