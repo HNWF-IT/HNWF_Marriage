@@ -3,8 +3,8 @@ import axiosInstance from "./axiosInstance";
 const CandidateAPI = {
   getAllCandidates: () => axiosInstance.post("/candidate/list"),
   getCandidateById: (id) => axiosInstance.get(`/candidates/${id}`),
-  addCandidate: (data) => axiosInstance.post("/candidates", data),
-  updateCandidate: (id, data) => axiosInstance.put(`/candidates/${id}`, data),
+  addCandidate: (data) => axiosInstance.post("/candidate/create", data),
+  updateCandidate: (id, data) => axiosInstance.put(`/candidate/update/${id}`, data),
   deleteCandidate: (id) => axiosInstance.delete(`/candidates/${id}`),
 };
 

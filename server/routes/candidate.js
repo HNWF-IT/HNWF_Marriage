@@ -52,20 +52,15 @@ router.get('/get/:id', async (req, res) => {
 router.put('/update/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id || !req.body) {
-      return res.status(400).json({ success: false, message: 'Missing ID or update data', data: {} });
-    }
+    const updateData = req.body;
 
-  Candidate.findByIdAndUpdate(id, { name, email, phoneNumber, education }, { new: true })
-    .then((updatedCandidate) => {
-      if (!updatedCandidate) {
-        return res.status(404).json({ success: false, message: 'Candidate not found', data: {} });
-      }
-      res.status(200).json({ success: true, message: 'Candidate updated successfully', data: updatedCandidate });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: 'Error updating candidate', data: err });
-    });
+    if (!id || !updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing ID or update data',
+        data: {},
+      });
+    }
 
     const updatedCandidate = await Candidate.findByIdAndUpdate(id, updateData, { new: true });
 
