@@ -11,7 +11,7 @@ const candidateSchema = new mongoose.Schema({
   },
   maritalStatus: { 
     type: String, 
-    enum: ["Single", "Married", "Divorced", "Widow"], 
+    enum: ["Single", "Married", "Divorced", "Widow", "Other"], 
     required: true 
   },
   muslimStatus: { 
@@ -20,38 +20,39 @@ const candidateSchema = new mongoose.Schema({
     required: true 
   },
   dob: { type: Date, required: true },
-  height: { type: String, required: true },
-  sourceOfIncome: { type: String, required: true },
+  height: { type: String },
+  incomeAmount: { type: String },
+  sourceOfIncome: { type: String },
   qualification: { 
     type: String, 
-    enum: ["Below Matric", "Matric", "Inter", "Bachelors", "Masters", "Phd", "Aalim"], 
+    enum: ["Below Matric", "Matric", "Inter", "Bachelors", "Masters", "Phd", "Aalim", "Other"], 
     required: true 
   },
-  caste: { type: String, required: true },
+  caste: { type: String },
   maslak: { 
     type: String, 
     enum: ["Ahl E Hadees", "Deoband", "Barelvi", "Shia", "Other"], 
     required: true 
   },
-  healthCondition: { type: String, required: true },
+  healthCondition: { type: String },
   fatherOccupation: { type: String },
   mother: { type: String },
   siblingsCount: { type: String, required: true },
-  houseSize: { type: String, required: true },
+  houseSize: { type: String },
   houseOwnership: { 
     type: String, 
-    enum: ["Own", "Rent"], 
-    required: true 
+    enum: ["Own", "Rent", "Other"]
   },
   contact: { type: String, required: true },
-  careOfContact: { type: String, required: true },
+  careOfContact: { type: String },
   nationality: { 
     type: String, 
-    enum: ["Pakistani", "Non-Pakistani"], 
+    enum: ["Pakistani", "Oversea Pakistani", "Foriegner"], 
     required: true 
   },
   city: { type: String, required: true },
   address: { type: String, required: true },
+  areaOfResidence: { type: String, required: true },
 });
 
 // Create the model from the schema

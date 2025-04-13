@@ -264,9 +264,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     type="text"
                     placeholder="Enter Father Occupation"
                     isInvalid={!!errors.fatherOccupation}
-                    {...register("fatherOccupation", {
-                      required: "Please provide Father Occupation"
-                    })}
+                    {...register("fatherOccupation")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.fatherOccupation?.message}
@@ -281,9 +279,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     type="text"
                     placeholder="Enter Caste"
                     isInvalid={!!errors.caste}
-                    {...register("caste", {
-                      required: "Please provide Caste"
-                    })}
+                    {...register("caste")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.caste?.message}
@@ -377,9 +373,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     type="number"
                     placeholder="Enter Income Amount"
                     isInvalid={!!errors.incomeAmount}
-                    {...register("incomeAmount", {
-                      required: "Please provide Income Amount"
-                    })}
+                    {...register("incomeAmount")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.incomeAmount?.message}
@@ -393,9 +387,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     type="text"
                     placeholder="Enter Source of Income"
                     isInvalid={!!errors.sourceOfIncome}
-                    {...register("sourceOfIncome", {
-                      required: "Please provide Source Of Income"
-                    })}
+                    {...register("sourceOfIncome")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.sourceOfIncome?.message}
@@ -437,9 +429,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     type="text"
                     placeholder="Enter House Size"
                     isInvalid={!!errors.houseSize}
-                    {...register("houseSize", {
-                      required: "Please provide house size"
-                    })}
+                    {...register("houseSize")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.houseSize?.message}
@@ -477,7 +467,7 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                     placeholder="Enter Area of Residence"
                     isInvalid={!!errors.areaOfResidence}
                     {...register("areaOfResidence", {
-                      // required: "Please provide Area of Residence"
+                      required: "Please provide Area of Residence"
                     })}
                   />
                   <Form.Control.Feedback type="invalid">
