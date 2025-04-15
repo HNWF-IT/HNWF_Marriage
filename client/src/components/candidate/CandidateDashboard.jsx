@@ -7,6 +7,7 @@ import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
 import CandidateStatsCard from './CandidateStatsCard';
 import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import { Education, Gender, MaritalStatus, MuslimStatus } from '../../enums/candidateEnums';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
@@ -216,8 +217,11 @@ const CandidateDashboard = () => {
                             onChange={(e) => handleFilterChange('gender', e.target.value)}
                             >
                             <option value="">All</option>
-                            <option>Male</option>
-                            <option>Female</option>
+                            {Object.values(Gender).map((gender) => (
+                              <option key={gender} value={gender}>
+                                {gender}
+                              </option>
+                            ))}
                           </Form.Select>
                       </Form.Group>
                     </Col>
@@ -230,10 +234,11 @@ const CandidateDashboard = () => {
                               onChange={(e) => handleFilterChange('maritalStatus', e.target.value)}
                           >
                           <option value="">All</option>
-                          <option>Single</option>
-                          <option>Married</option>
-                          <option>Divorced</option>
-                          <option>Widow</option>
+                          {Object.values(MaritalStatus).map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
                           </Form.Select>
                       </Form.Group>
                     </Col>
@@ -246,13 +251,11 @@ const CandidateDashboard = () => {
                               onChange={(e) => handleFilterChange('qualification', e.target.value)}
                           >
                           <option value="">All</option>
-                          <option>Below Matric</option>
-                          <option>Matric</option>
-                          <option>Inter</option>
-                          <option>Bachelors</option>
-                          <option>Masters</option>
-                          <option>Phd</option>
-                          <option>Aalim</option>
+                          {Object.values(Education).map((edu) => (
+                            <option key={edu} value={edu}>
+                              {edu}
+                            </option>
+                          ))}
                           </Form.Select>
                       </Form.Group>
                     </Col>
@@ -265,8 +268,11 @@ const CandidateDashboard = () => {
                               onChange={(e) => handleFilterChange('muslimStatus', e.target.value)}
                           >
                           <option value="">All</option>
-                          <option>Born</option>
-                          <option>Reverted</option>
+                          {Object.values(MuslimStatus).map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
                           </Form.Select>
                       </Form.Group>
                     </Col>
