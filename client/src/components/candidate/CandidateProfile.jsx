@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Container, 
   Row, 
@@ -10,34 +10,38 @@ import {
 } from 'react-bootstrap';
 // Make sure to import Bootstrap CSS in your main file
 // import 'bootstrap/dist/css/bootstrap.min.css';
+import { calculateAge } from "../../utils/helper";
+import CandidateAPI from '../../api/candidate';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const CandidateProfile = ({ candidate }) => {
-  // Sample candidate data
-  const sampleCandidate = candidate || {
-    name: "Ayesha Ahmed",
-    fatherName: "Zafar Ahmed",
-    gender: "Female",
-    maritalStatus: "Single",
-    dob: "1994-08-23",
-    height: "5'6\"",
-    sourceOfIncome: "Doctor",
-    qualification: "MBBS",
-    caste: "Syed",
-    maslak: "Sunni",
-    healthCondition: "Excellent",
-    fatherOccupation: "Professor",
-    mother: "Saima Ahmed",
-    siblings: "1 brother, 2 sisters",
-    house: "Owned",
-    houseSize: "1 kanal",
-    contact: "+92 333 9876543",
-    nationality: "Pakistani",
-    muslimStatus: "By birth",
-    city: "Islamabad",
-    area: "F-10"
-  };
+const CandidateProfile = () => {
+  const { id } = useParams();
+  const [candidate, setCandidate] = useState(null);
+  const [loading, setLoading] = useState(null);
+
+  useEffect(() => {
+    const fetchCandidate = async (candidId) => {
+      setLoading(true);
+      try {
+        const response = await CandidateAPI.getCandidateById(candidId);
+        if(response.data.success && response.data.data) {
+          setCandidate(response.data.data);
+        }
+      } catch (error) {
+        const message = error?.message || "Something went wrong";
+        toast.error(message);
+      } finally {
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        setLoading(false);
+      }
+    };
+  
+    fetchCandidate(id);
+  }, [id]);
 
   // Calculate age
+  /*
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -48,11 +52,12 @@ const CandidateProfile = ({ candidate }) => {
     }
     return age;
   };
+  */
 
   // Custom styles for elements not easily styled with Bootstrap classes
   const styles = {
     header: {
-      background: 'linear-gradient(to right, #28a745, #1e7e34)',
+      background: 'linear-gradient(to right, #4c6c44, #1e7e34)',
       color: 'white',
       padding: '2rem',
       position: 'relative'
@@ -104,6 +109,10 @@ const CandidateProfile = ({ candidate }) => {
     }
   };
 
+  if(loading) {
+    return <>Loading...</>
+  }
+
   return (
     <Container className="my-4" style={{ maxWidth: '1000px' }}>
       {/* Decorative header */}
@@ -115,224 +124,229 @@ const CandidateProfile = ({ candidate }) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-light p-4">
-        {/* Top section with name and primary info */}
-        <Row className="mb-4 pb-3 border-bottom">
-          <Col xs={12} md={3} className="d-flex justify-content-center">
-            <div style={styles.photoPlaceholder}>
-              <span>Photo</span>
-            </div>
-          </Col>
-          <Col xs={12} md={9}>
-            <h2 className="fw-bold text-dark">{sampleCandidate.name}</h2>
-            <p className="text-success fw-medium">
-              {sampleCandidate.qualification} • {sampleCandidate.sourceOfIncome}
-            </p>
-            <div className="d-flex flex-wrap gap-2 mt-3">
-              <Badge bg="success" className="rounded-pill p-2">
-                {calculateAge(sampleCandidate.dob)} Years
-              </Badge>
-              <Badge bg="success" className="rounded-pill p-2">
-                {sampleCandidate.height}
-              </Badge>
-              <Badge bg="success" className="rounded-pill p-2">
-                {sampleCandidate.city}
-              </Badge>
-              <Badge bg="success" className="rounded-pill p-2">
-                {sampleCandidate.maslak}
-              </Badge>
-            </div>
-          </Col>
-        </Row>
+      {candidate ? (
+        <>
+          {/* Main Content */}
+          <div className="bg-light p-4">
+            {/* Top section with name and primary info */}
+            <Row className="mb-4 pb-3 border-bottom">
+              <Col xs={12} md={3} className="d-flex justify-content-center">
+                <div style={styles.photoPlaceholder}>
+                  <span>Photo</span>
+                </div>
+              </Col>
+              <Col xs={12} md={9}>
+                <h2 className="fw-bold text-dark">{candidate.name}</h2>
+                <p className="text-success fw-medium">
+                  {candidate.qualification} • {candidate.sourceOfIncome}
+                </p>
+                <div className="d-flex flex-wrap gap-2 mt-3">
+                  <Badge bg="success" className="rounded-pill p-2">
+                    {calculateAge(candidate.dob)} Years
+                  </Badge>
+                  <Badge bg="success" className="rounded-pill p-2">
+                    {candidate.height}
+                  </Badge>
+                  <Badge bg="success" className="rounded-pill p-2">
+                    {candidate.city}
+                  </Badge>
+                  <Badge bg="success" className="rounded-pill p-2">
+                    {candidate.maslak}
+                  </Badge>
+                </div>
+              </Col>
+            </Row>
 
-        {/* Information sections */}
-        <Row className="g-4">
-          {/* Personal Details */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>👤</span>
-                  Personal Details
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Gender</span>
-                    <span className="fw-medium">{sampleCandidate.gender}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Marital Status</span>
-                    <span className="fw-medium">{sampleCandidate.maritalStatus}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Date of Birth</span>
-                    <span className="fw-medium">{new Date(sampleCandidate.dob).toLocaleDateString()}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Nationality</span>
-                    <span className="fw-medium">{sampleCandidate.nationality}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">Health</span>
-                    <span className="fw-medium">{sampleCandidate.healthCondition}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
+            {/* Information sections */}
+            <Row className="g-4">
+              {/* Personal Details */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>👤</span>
+                      Personal Details
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Gender</span>
+                        <span className="fw-medium">{candidate.gender}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Marital Status</span>
+                        <span className="fw-medium">{candidate.maritalStatus}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Date of Birth</span>
+                        <span className="fw-medium">{new Date(candidate.dob).toLocaleDateString()}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Nationality</span>
+                        <span className="fw-medium">{candidate.nationality}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">Health</span>
+                        <span className="fw-medium">{candidate.healthCondition}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
 
-          {/* Family Background */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>👪</span>
-                  Family Background
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Father's Name</span>
-                    <span className="fw-medium">{sampleCandidate.fatherName}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Father's Occupation</span>
-                    <span className="fw-medium">{sampleCandidate.fatherOccupation}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Mother's Name</span>
-                    <span className="fw-medium">{sampleCandidate.mother}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Siblings</span>
-                    <span className="fw-medium">{sampleCandidate.siblings}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">Caste</span>
-                    <span className="fw-medium">{sampleCandidate.caste}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
+              {/* Family Background */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>👪</span>
+                      Family Background
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Father's Name</span>
+                        <span className="fw-medium">{candidate.fatherName}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Father's Occupation</span>
+                        <span className="fw-medium">{candidate.fatherOccupation}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Mother's Name</span>
+                        <span className="fw-medium">{candidate.mother}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Siblings</span>
+                        <span className="fw-medium">{candidate.siblings}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">Caste</span>
+                        <span className="fw-medium">{candidate.caste}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
 
-          {/* Education & Career */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>🎓</span>
-                  Education & Career
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Qualification</span>
-                    <span className="fw-medium">{sampleCandidate.qualification}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">Source of Income</span>
-                    <span className="fw-medium">{sampleCandidate.sourceOfIncome}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
+              {/* Education & Career */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>🎓</span>
+                      Education & Career
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Qualification</span>
+                        <span className="fw-medium">{candidate.qualification}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">Source of Income</span>
+                        <span className="fw-medium">{candidate.sourceOfIncome}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
 
-          {/* Religious Information */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>🕌</span>
-                  Religious Information
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Muslim Status</span>
-                    <span className="fw-medium">{sampleCandidate.muslimStatus}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">Maslak</span>
-                    <span className="fw-medium">{sampleCandidate.maslak}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
+              {/* Religious Information */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>🕌</span>
+                      Religious Information
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Muslim Status</span>
+                        <span className="fw-medium">{candidate.muslimStatus}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">Maslak</span>
+                        <span className="fw-medium">{candidate.maslak}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
 
-          {/* Residence */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>🏠</span>
-                  Residence
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">City</span>
-                    <span className="fw-medium">{sampleCandidate.city}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">Area</span>
-                    <span className="fw-medium">{sampleCandidate.area}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between">
-                    <span className="text-muted">House Type</span>
-                    <span className="fw-medium">{sampleCandidate.house}</span>
-                  </ListGroup.Item>
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">House Size</span>
-                    <span className="fw-medium">{sampleCandidate.houseSize}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
+              {/* Residence */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>🏠</span>
+                      Residence
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">City</span>
+                        <span className="fw-medium">{candidate.city}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">Area</span>
+                        <span className="fw-medium">{candidate.area}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between">
+                        <span className="text-muted">House Type</span>
+                        <span className="fw-medium">{candidate.house}</span>
+                      </ListGroup.Item>
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">House Size</span>
+                        <span className="fw-medium">{candidate.houseSize}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
 
-          {/* Contact */}
-          <Col xs={12} md={6}>
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-white border-bottom-0">
-                <h3 className="h5 mb-0">
-                  <span style={styles.sectionIcon}>📱</span>
-                  Contact Information
-                </h3>
-              </Card.Header>
-              <Card.Body className="pt-2">
-                <ListGroup variant="flush">
-                  <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
-                    <span className="text-muted">Phone Number</span>
-                    <span className="fw-medium">{sampleCandidate.contact}</span>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+              {/* Contact */}
+              <Col xs={12} md={6}>
+                <Card className="h-100 shadow-sm">
+                  <Card.Header className="bg-white border-bottom-0">
+                    <h3 className="h5 mb-0">
+                      <span style={styles.sectionIcon}>📱</span>
+                      Contact Information
+                    </h3>
+                  </Card.Header>
+                  <Card.Body className="pt-2">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item className="d-flex justify-content-between border-bottom-0">
+                        <span className="text-muted">Phone Number</span>
+                        <span className="fw-medium">{candidate.contact}</span>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </div>
 
-      {/* Footer */}
-      <div style={styles.footer}>
-        <Row>
-          <Col xs={12} md={6}>
-            <p className="mb-md-0">Generated on {new Date().toLocaleDateString()}</p>
-          </Col>
-          <Col xs={12} md={6} className="text-md-end">
-            <p className="mb-0">Confidential - For matrimonial purposes only</p>
-          </Col>
-        </Row>
-      </div>
+          {/* Footer */}
+          <div style={styles.footer}>
+            <Row>
+              <Col xs={12} md={6}>
+                <p className="mb-md-0">Generated on {new Date().toLocaleDateString()}</p>
+              </Col>
+              <Col xs={12} md={6} className="text-md-end">
+                <p className="mb-0">Confidential - For matrimonial purposes only</p>
+              </Col>
+            </Row>
+          </div>
+          
+        </>
+      ) : "No Candidate Found"}
     </Container>
   );
 };
