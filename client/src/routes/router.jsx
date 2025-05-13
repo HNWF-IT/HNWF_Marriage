@@ -9,6 +9,7 @@ import CandidateDashboard from "../components/candidate/CandidateDashboard";
 import Dashboard from "../components/dashboard/Dashboard";
 import isLoggedIn from "../utils";
 import BookList from "../components/library/BookList";
+import CandidateProfile from "../components/candidate/CandidateProfile";
 
 let ROUTES = <></>;
 
@@ -19,6 +20,7 @@ if (isLoggedIn()) {
       <Route path="login" element={<Login />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="marriage" element={<CandidateDashboard />} />
+      <Route path="/candidates/:id" element={<CandidateProfile />} />
       <Route path="library" element={<BookList />} />
     </Route>
   </>

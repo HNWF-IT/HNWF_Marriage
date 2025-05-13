@@ -373,9 +373,12 @@ const CandidateDashboard = () => {
                             >
                               <i className="bi bi-pencil"></i>
                             </Button>
-                            <Button variant="light" size="sm">
-                              <i className="bi bi-three-dots-vertical"></i>
-                            </Button>
+
+                            <Link to={`/candidates/${candidate._id}`}>
+                              <Button variant="light" size="sm">
+                                <i className="bi bi-three-dots-vertical"></i>
+                              </Button>
+                            </Link>
                           </td>
                         </tr>
                       ))}
