@@ -35,6 +35,7 @@ const CandidateDashboard = () => {
         const response = await CandidateAPI.getAllCandidates();
         if(response.data.success && response.data.data) {
           setCandidates(response.data.data);
+          sessionStorage.setItem('candidates', JSON.stringify(response.data.data));
         }
       } catch (error) {
         const message = error?.message || "Something went wrong";
@@ -45,7 +46,12 @@ const CandidateDashboard = () => {
       }
     };
   
-    fetchCandidates();
+    const cached = sessionStorage.getItem('candidates');
+    if (cached) {
+      setCandidates(JSON.parse(cached));
+    } else {
+      fetchCandidates();
+    }
   }, []);
 
   const filteredCandidates = candidates?.filter(candidate => {
