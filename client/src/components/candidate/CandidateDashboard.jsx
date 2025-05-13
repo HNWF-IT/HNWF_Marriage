@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 import CandidateStatsCard from './CandidateStatsCard';
 import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 import { Education, Gender, MaritalStatus, MuslimStatus } from '../../enums/candidateEnums';
+import { calculateAge } from "../../utils/helper";
+import { Link } from 'react-router-dom';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
@@ -103,7 +105,7 @@ const CandidateDashboard = () => {
     setCandidates(initialCandidatesNew);
   };
 
-  const calculateAge = (dob) => {
+  /*const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -112,7 +114,7 @@ const CandidateDashboard = () => {
       age--;
     }
     return age;
-  };
+  };*/
 
   const handleCandidateAddOrUpdate = (newCandidate, mode) => {
     if(mode === "add") {
@@ -343,7 +345,7 @@ const CandidateDashboard = () => {
                     </thead>
                     <tbody>
                       {currentPageCandidates?.map((candidate, index) => ( 
-                        <tr key={candidate.id}>
+                        <tr key={candidate._id}>
                           <td>{index + 1}</td>
                           <td>
                           <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
