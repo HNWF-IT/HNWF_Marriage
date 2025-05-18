@@ -1,200 +1,319 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import BookAPI from '../../api/book';
+import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
 
-// Hardcoded enum values
-const BookStatus = {
-  AVAILABLE: 'Available',
-  CHECKED_OUT: 'Checked Out',
-  RESERVED: 'Reserved',
-  LOST: 'Lost'
-};
+const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => {
+  console.log("Book Data: ", bookData);
 
-const BookGenre = {
-  FICTION: 'Fiction',
-  NON_FICTION: 'Non-Fiction',
-  SCIENCE: 'Science',
-  HISTORY: 'History',
-  BIOGRAPHY: 'Biography',
-  FANTASY: 'Fantasy'
-};
+  const { 
+    register, 
+    handleSubmit, 
+    reset,
+    formState: { errors, isDirty, isValid },
+    setValue,
+    watch
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      title: '',
+      author: '',
+      isbn: '',
+      publicationYear: '',
+      publisher: '',
+      genre: '',
+      language: '',
+      pageCount: '',
+      status: '',
+      shelfLocation: '',
+      description: ''
+    }
+  });
 
-const BookLanguage = {
-  ENGLISH: 'English',
-  SPANISH: 'Spanish',
-  FRENCH: 'French',
-  GERMAN: 'German',
-  OTHER: 'Other'
-};
+  // Reset form when bookData changes
+  useEffect(() => {
+    if (bookData) {
+      // Set all values from bookData
+      Object.entries(bookData).forEach(([key, value]) => {
+        if(key === 'dob') {
+          setValue(key, candidateData?.dob.split("T")[0])
+        } else setValue(key, value);
+      });
+    } else {
+      reset(); // Reset to default values
+    }
+  }, [bookData, reset, setValue]);
 
-const BookModal = ({ mode, bookData, show, handleClose }) => {
-  // Hardcoded form data
-  const formData = bookData || {
-    title: '',
-    author: '',
-    isbn: '',
-    publicationYear: '',
-    publisher: '',
-    genre: '',
-    language: '',
-    pageCount: '',
-    status: '',
-    shelfLocation: '',
-    description: ''
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Book ${mode === 'add' ? 'added' : 'updated'} successfully!`);
+  const closeModal = () => {
+    reset();
     handleClose();
   };
 
+  const onSubmit = (newBook) => {
+    if (mode === 'add') {
+      BookAPI.addBook(newBook)
+        .then((response) => {
+          onBookAddOrUpdate(response.data.data, mode);
+          console.log("Response", response);
+          toast.success("Book added successfully");
+          closeModal();
+        })
+        .catch((error) => {
+          const message = error?.message || "Something went wrong";
+          toast.error(message);
+          closeModal();
+        });
+    } else {
+      BookAPI.updateBook(newBook._id, newBook)
+        .then((response) => {
+          onBookAddOrUpdate(response.data.data, mode);
+          console.log("Update Response: ", response);
+          toast.success("Book updated successfully");
+          closeModal();
+        })
+        .catch((error) => {
+          const message = error?.message || "Something went wrong";
+          toast.error(message);
+          closeModal();
+        });
+    }
+  };
+
   return (
-    <Modal show={show} onHide={handleClose} size="lg" centered>
-      <Modal.Header closeButton style={{backgroundColor: "#2c3e50", color: "white"}}>
+    <Modal 
+      show={show} 
+      onHide={closeModal}
+      size="lg"
+      centered
+      backdrop="static"
+    >
+      <Modal.Header closeButton closeVariant="white" className="text-white" style={{backgroundColor: "#4C6C44"}}>
         <Modal.Title>{mode === "edit" ? "Edit Book" : "Add New Book"}</Modal.Title>
       </Modal.Header>
 
-      <form onSubmit={handleSubmit}>
-        <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
-          <div className="p-4 rounded shadow-sm">
-            <h5 style={{color: "#3498db"}}>Basic Information</h5>
-            <Row className="mb-4">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Modal.Body 
+            className="bg-light"
+            style={{
+                maxHeight: "70vh",
+                overflowY: "auto",
+              }}
+        >
+          <div className="bg-white p-4 rounded shadow-sm">
+            {/* Personal Information Section */}
+            <h5 className="mb-4" style={{color: "#A49559"}}>Basic Information</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Title</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter book title"
-                    defaultValue={formData.title}
-                    required
+                    isInvalid={!!errors.title}
+                    {...register("title", {
+                      required: "Title is required",
+                      minLength: { value: 3, message: "Title must be at least 3 characters" }
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.title?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
+
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Author</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter author name"
-                    defaultValue={formData.author}
-                    required
+                    isInvalid={!!errors.author}
+                    {...register("author", {
+                      required: "Author is required"
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.author?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
+
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>ISBN</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter ISBN (10 or 13 digits)"
-                    defaultValue={formData.isbn}
-                    required
+                    placeholder="Enter ISBN"
+                    isInvalid={!!errors.isbn}
+                    {...register("isbn", {
+                      validate: (value) =>
+                        !value || value.length === 13 || "ISBN must be 13 characters"
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.isbn?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
+
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Publication Year</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="Enter publication year"
-                    defaultValue={formData.publicationYear}
-                    required
+                    placeholder="Enter year"
+                    isInvalid={!!errors.publicationYear}
+                    {...register("publicationYear", {
+                      required: "Publication year is required",
+                      validate: (value) =>
+                        /^\d{4}$/.test(value) && value >= 1000 && value <= new Date().getFullYear()
+                          ? true
+                          : "Enter a valid 4-digit year"
+                    })}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.publicationYear?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Publisher</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter publisher"
+                    {...register("publisher")}
                   />
                 </Form.Group>
               </Col>
-            </Row>
 
-            <h5 style={{color: "#3498db"}}>Classification</h5>
-            <Row className="mb-4">
-              <Col md={4}>
+              <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Genre</Form.Label>
-                  <Form.Select defaultValue={formData.genre} required>
-                    <option value="">Select Genre</option>
-                    {Object.values(BookGenre).map((genre) => (
+                  <Form.Select
+                    isInvalid={!!errors.genre}
+                    {...register("genre", {
+                      required: "Genre is required"
+                    })}
+                  >
+                    <option value="">Select genre</option>
+                    {Object.values(BookGenre).map(genre => (
                       <option key={genre} value={genre}>{genre}</option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.genre?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-              <Col md={4}>
+
+              <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Language</Form.Label>
-                  <Form.Select defaultValue={formData.language} required>
+                  <Form.Select
+                    isInvalid={!!errors.language}
+                    {...register("language", {
+                      required: "Language is required"
+                    })}
+                  >
                     <option value="">Select Language</option>
-                    {Object.values(BookLanguage).map((language) => (
-                      <option key={language} value={language}>{language}</option>
+                    {Object.values(BookLanguage).map(lang => (
+                      <option key={lang} value={lang}>{lang}</option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.language?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-              <Col md={4}>
+
+              <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Page Count</Form.Label>
                   <Form.Control
                     type="number"
-                    min="1"
-                    placeholder="Enter page count"
-                    defaultValue={formData.pageCount}
-                    required
+                    placeholder="Enter number of pages"
+                    isInvalid={!!errors.pageCount}
+                    {...register("pageCount", {
+                      required: "Page count is required",
+                      min: { value: 1, message: "Page count must be at least 1" }
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.pageCount?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-            </Row>
 
-            <h5 style={{color: "#3498db"}}>Inventory Information</h5>
-            <Row className="mb-4">
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Status</Form.Label>
-                  <Form.Select defaultValue={formData.status} required>
-                    <option value="">Select Status</option>
-                    {Object.values(BookStatus).map((status) => (
-                      <option key={status} value={status}>{status}</option>
+                  <Form.Select
+                    isInvalid={!!errors.status}
+                    {...register("status", {
+                      required: "Status is required"
+                    })}
+                  >
+                    <option value="">Select status</option>
+                    {Object.values(BookStatus).map(lang => (
+                      <option key={lang} value={lang}>{lang}</option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.status?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
+
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Shelf Location</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter shelf location (e.g., A12-3)"
-                    defaultValue={formData.shelfLocation}
-                    required
+                    placeholder="Enter shelf location"
+                    isInvalid={!!errors.shelfLocation}
+                    {...register("shelfLocation", {
+                      required: "Shelf location is required"
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.shelfLocation?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-            </Row>
 
-            <h5 style={{color: "#3498db"}}>Additional Information</h5>
-            <Row>
               <Col md={12}>
                 <Form.Group className="mb-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
-                    placeholder="Enter book description"
-                    defaultValue={formData.description}
+                    placeholder="Enter a brief description"
+                    {...register("description")}
                   />
                 </Form.Group>
               </Col>
             </Row>
+
           </div>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button onClick={closeModal} style={{backgroundColor: "#A49559"}}>
             Cancel
           </Button>
-          <Button type="submit" style={{backgroundColor: "#2c3e50", borderColor: "#2c3e50"}}>
-            {mode === 'add' ? "Add Book" : "Update Book"}
+          <Button 
+            type="submit" 
+            style={{backgroundColor: "#4C6C44"}}
+            // disabled={!isDirty || !isValid}
+          >
+            {mode === 'add' ? "Add" : "Update"}
           </Button>
         </Modal.Footer>
-      </form>
+      </Form>
     </Modal>
   );
 };
