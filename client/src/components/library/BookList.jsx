@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination } from 'react-bootstrap';
-import { BookFill } from 'react-bootstrap-icons';
+import { Book, BookFill, CollectionFill, PeopleFill } from 'react-bootstrap-icons';
 import BookAPI from '../../api/book';
 import { useEffect } from 'react';
 import BookModal from './BookModal';
 import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
+import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import StatsCardRow from '../commons/stats/StatsCardRow';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
@@ -106,8 +108,32 @@ const BookList = () => {
     }
   };
 
+  const booksStats = [
+    {
+      icon: <Book size={40} className="text-warning" />,
+      label: "Total Books",
+      value: books.length,
+      bgColor: "bg-warning-subtle",
+      textColor: "text-warning"
+    },
+    {
+      icon: <CollectionFill size={40} className="text-primary" />,
+      label: "Available Books",
+      value: books.filter(b => b.status === "Available").length,
+      bgColor: "bg-primary-subtle",
+      textColor: "text-primary"
+    },
+    {
+      icon: <PeopleFill size={40} className="text-success" />,
+      label: "Checked Out",
+      value: books.filter(b => b.status === "Checked Out").length,
+      bgColor: "bg-success-subtle",
+      textColor: "text-success"
+    }
+  ];
+
   if(loading) {
-    return <>Loading...</>
+    return <><PulseDotLoader /></>
   }
 
   return (
@@ -148,41 +174,8 @@ const BookList = () => {
               </div>
             </div>
 
-            {/* Simple stats cards */}
-            <Row className="mb-4">
-              <Col md={3}>
-                <Card className="border-0 shadow-sm">
-                  <Card.Body className="text-center">
-                    <h5>Total Books</h5>
-                    <h3>{books.length}</h3>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3}>
-                <Card className="border-0 shadow-sm">
-                  <Card.Body className="text-center">
-                    <h5>Available</h5>
-                    <h3>{books.filter(b => b.status === 'Available').length}</h3>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3}>
-                <Card className="border-0 shadow-sm">
-                  <Card.Body className="text-center">
-                    <h5>Checked Out</h5>
-                    <h3>{books.filter(b => b.status === 'Checked Out').length}</h3>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3}>
-                <Card className="border-0 shadow-sm">
-                  <Card.Body className="text-center">
-                    <h5>Genres</h5>
-                    <h3>{new Set(books.map(b => b.genre)).size}</h3>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
+            {/* Stats cards */}
+            <StatsCardRow stats={booksStats} />
 
             {/* Search */}
             <Row className="mb-4">

@@ -10,6 +10,12 @@ import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 import { Education, Gender, MaritalStatus, MuslimStatus } from '../../enums/candidateEnums';
 import { calculateAge } from "../../utils/helper";
 import { Link } from 'react-router-dom';
+import { 
+  PeopleFill, 
+  HeartFill, 
+  PersonCheckFill 
+} from 'react-bootstrap-icons';
+import StatsCardRow from '../commons/stats/StatsCardRow';
 
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
@@ -134,6 +140,30 @@ const CandidateDashboard = () => {
     }
   };
 
+  const candidatesStats = [
+      {
+        icon: <PeopleFill size={40} className="text-primary" />,
+        label: "Total Candidates",
+        value: candidates.length,
+        bgColor: "bg-primary-subtle",
+        textColor: "text-primary"
+      },
+      {
+        icon: <HeartFill size={40} className="text-success" />,
+        label: "Married",
+        value: candidates.filter(c => c.maritalStatus === "Married").length,
+        bgColor: "bg-success-subtle",
+        textColor: "text-success"
+      },
+      {
+        icon: <PersonCheckFill size={40} className="text-warning" />,
+        label: "Single",
+        value: candidates.filter(c => c.maritalStatus === "Single").length,
+        bgColor: "bg-warning-subtle",
+        textColor: "text-warning"
+      }
+    ];
+
   return (
     <>
       { showModal ? <CandidateModal
@@ -172,7 +202,8 @@ const CandidateDashboard = () => {
               </div>
             </div>
             
-            <CandidateStatsCard />
+            {/* Stats cards */}
+            <StatsCardRow stats={candidatesStats} />
 
             {/* Main Search */}
             <InputGroup className="mb-4">
