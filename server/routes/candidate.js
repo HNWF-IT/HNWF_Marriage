@@ -30,6 +30,37 @@ router.post('/list', async (req, res) => {
   }
 });
 
+// Get all candidates with optional filters
+router.post('/batch', async (req, res) => {
+  try {
+    const batchNo = parseInt(req.query.batch) || 1;
+    const limit = 50;
+    const skip = (batchNo - 1) * limit;
+
+    const filters = req.body?.filters || {};
+    const candidates = await Candidate.find(filters)
+      .skip(skip)
+      .limit(limit);
+
+    const responseData = {
+      candidates
+    };
+
+    if (batchNo === 1) {
+      const totalCount = await Candidate.countDocuments(filters);
+      responseData.totalCount = totalCount;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Candidates (batch: ${batchNo}) returned successfully`,
+      data: responseData,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: 'Error fetching candidates', data: err });
+  }
+});
+
 // Get a candidate by ID
 router.get('/get/:id', async (req, res) => {
   try {

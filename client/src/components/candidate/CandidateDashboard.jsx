@@ -5,7 +5,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
 import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
-import CandidateStatsCard from './CandidateStatsCard';
 import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 import { Education, Gender, MaritalStatus, MuslimStatus } from '../../enums/candidateEnums';
 import { calculateAge } from "../../utils/helper";
@@ -17,6 +16,7 @@ import {
 } from 'react-bootstrap-icons';
 import StatsCardRow from '../commons/stats/StatsCardRow';
 
+const CANDIDATES_PER_BATCH = 50;
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
   const [filters, setFilters] = useState({
@@ -33,31 +33,34 @@ const CandidateDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState({});
+  const [batch, setBatch] = useState(1);
+  const [totalBatches, setTotalBatches] = useState(null);
+
+  const fetchCandidates = async (batchNo) => {
+    setLoading(true);
+    try {
+      const response = await CandidateAPI.getCandidatesBatch(batchNo);
+      // const temp = await CandidateAPI.getAllCandidates();
+
+      if(response.data.success && response.data.data) {
+        const { candidates, totalCount } = response.data.data;
+
+        setCandidates(candidates);
+        if (totalCount) {
+          setTotalBatches(Math.ceil(totalCount / CANDIDATES_PER_BATCH));
+        }
+      }
+    } catch (error) {
+      const message = error?.message || "Something went wrong";
+      toast.error(message);
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCandidates = async () => {
-      setLoading(true);
-      try {
-        const response = await CandidateAPI.getAllCandidates();
-        if(response.data.success && response.data.data) {
-          setCandidates(response.data.data);
-          sessionStorage.setItem('candidates', JSON.stringify(response.data.data));
-        }
-      } catch (error) {
-        const message = error?.message || "Something went wrong";
-        toast.error(message);
-      } finally {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setLoading(false);
-      }
-    };
-  
-    const cached = sessionStorage.getItem('candidates');
-    if (cached) {
-      setCandidates(JSON.parse(cached));
-    } else {
-      fetchCandidates();
-    }
+    fetchCandidates(batch);
   }, []);
 
   const filteredCandidates = candidates?.filter(candidate => {
@@ -141,28 +144,45 @@ const CandidateDashboard = () => {
   };
 
   const candidatesStats = [
-      {
-        icon: <PeopleFill size={40} className="text-primary" />,
-        label: "Total Candidates",
-        value: candidates.length,
-        bgColor: "bg-primary-subtle",
-        textColor: "text-primary"
-      },
-      {
-        icon: <HeartFill size={40} className="text-success" />,
-        label: "Married",
-        value: candidates.filter(c => c.maritalStatus === "Married").length,
-        bgColor: "bg-success-subtle",
-        textColor: "text-success"
-      },
-      {
-        icon: <PersonCheckFill size={40} className="text-warning" />,
-        label: "Single",
-        value: candidates.filter(c => c.maritalStatus === "Single").length,
-        bgColor: "bg-warning-subtle",
-        textColor: "text-warning"
-      }
-    ];
+    {
+      icon: <PeopleFill size={40} className="text-primary" />,
+      label: "Total Candidates",
+      value: candidates.length,
+      bgColor: "bg-primary-subtle",
+      textColor: "text-primary"
+    },
+    {
+      icon: <HeartFill size={40} className="text-success" />,
+      label: "Married",
+      value: candidates.filter(c => c.maritalStatus === "Married").length,
+      bgColor: "bg-success-subtle",
+      textColor: "text-success"
+    },
+    {
+      icon: <PersonCheckFill size={40} className="text-warning" />,
+      label: "Single",
+      value: candidates.filter(c => c.maritalStatus === "Single").length,
+      bgColor: "bg-warning-subtle",
+      textColor: "text-warning"
+    }
+  ];
+
+
+ const handleNextBatch = () => {
+    if (totalBatches && batch < totalBatches) {
+      const next = batch + 1;
+      setBatch(next);
+      fetchCandidates(next);
+    }
+  };
+
+  const handlePrevBatch = () => {
+    if (batch > 1) {
+      const prev = batch - 1;
+      setBatch(prev);
+      fetchCandidates(prev);
+    }
+  };
 
   return (
     <>
@@ -432,7 +452,11 @@ const CandidateDashboard = () => {
 
                 <Row className="d-flex justify-content-between">
                 <Col className="text-center">
-                <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
+                  <Button
+                    style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
+                    onClick={handlePrevBatch}
+                    disabled={batch === 1}
+                  >
                     Prev
                   </Button>
                 </Col>
@@ -467,7 +491,11 @@ const CandidateDashboard = () => {
                 </Col>
 
                 <Col className="text-center">
-                  <Button style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}>
+                  <Button
+                    style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
+                    onClick={handleNextBatch}
+                    disabled={batch === totalBatches}
+                  >
                     Next
                   </Button>
                 </Col>
