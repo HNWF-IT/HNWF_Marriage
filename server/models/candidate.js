@@ -32,7 +32,7 @@ const candidateSchema = new mongoose.Schema({
     type: String, 
     enum: ["Done", "Seeking", "On Hold"],
     required: true,
-    default: 'LOOKING'
+    default: 'Seeking'
   },
   caste: { type: String },
   maslak: { 
