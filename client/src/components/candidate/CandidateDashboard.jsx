@@ -12,7 +12,9 @@ import { Link } from 'react-router-dom';
 import { 
   PeopleFill, 
   HeartFill, 
-  PersonCheckFill 
+  PersonCheckFill, 
+  Search,
+  Filter
 } from 'react-bootstrap-icons';
 import StatsCardRow from '../commons/stats/StatsCardRow';
 
@@ -35,11 +37,17 @@ const CandidateDashboard = () => {
   const [selectedCandidate, setSelectedCandidate] = useState({});
   const [batch, setBatch] = useState(1);
   const [totalBatches, setTotalBatches] = useState(null);
+  const [willingStatus, setWillingStatus] = useState('Seeking');
 
   const fetchCandidates = async (batchNo) => {
     setLoading(true);
     try {
-      const response = await CandidateAPI.getCandidatesBatch(batchNo);
+      const filters = {};
+      if (willingStatus !== "") {
+        filters.willingStatus = willingStatus;
+      }
+
+      const response = await CandidateAPI.getCandidatesBatch(batchNo, filters);
       // const temp = await CandidateAPI.getAllCandidates();
 
       if(response.data.success && response.data.data) {
@@ -61,7 +69,7 @@ const CandidateDashboard = () => {
 
   useEffect(() => {
     fetchCandidates(batch);
-  }, []);
+  }, [batch, willingStatus]);
 
   const filteredCandidates = candidates?.filter(candidate => {
     return (
@@ -221,22 +229,6 @@ const CandidateDashboard = () => {
                 </Button>
               </div>
             </div>
-            
-            {/* Stats cards */}
-            <StatsCardRow stats={candidatesStats} />
-
-            {/* Main Search */}
-            <InputGroup className="mb-4">
-              <InputGroup.Text className="bg-white">
-                <i className="bi bi-search"></i>
-              </InputGroup.Text>
-              <Form.Control
-                placeholder="Search candidates by name..."
-                value={filters.name}
-                onChange={(e) => handleFilterChange('name', e.target.value)}
-                className="border-start-0"
-              />
-            </InputGroup>
 
             {/* Advanced Filters */}
             <Collapse in={showFilters}>
@@ -359,6 +351,46 @@ const CandidateDashboard = () => {
                 </Row>
               </div>
             </Collapse>
+            
+            {/* Stats cards */}
+            <StatsCardRow stats={candidatesStats} />
+            
+            {/* Filters and Search */}
+            <Card className="shadow-sm mb-4">
+              <Card.Body>
+                <Row className="align-items-center">
+                  <Col md={9} className="mb-3 mb-md-0">
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <Search />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Search candidates by name..."
+                        value={filters.name}
+                        onChange={(e) => handleFilterChange('name', e.target.value)}
+                      />
+                    </InputGroup>
+                  </Col>
+                  <Col md={3} className="mb-3 mb-md-0">
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <Filter />
+                      </InputGroup.Text>
+                      <Form.Select
+                        value={willingStatus}
+                        onChange={(e) => { setWillingStatus(e.target.value); setBatch(1) }}
+                      >
+                        <option value="">All</option>
+                        <option value="Seeking">Seeking</option>
+                        <option value="Done">Done</option>
+                        <option value="On Hold">On Hold</option>
+                      </Form.Select>
+                    </InputGroup>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
 
             { loading ? 
               (<PulseDotLoader />) : 
@@ -397,6 +429,9 @@ const CandidateDashboard = () => {
                         <th style={{ cursor: 'pointer' }}>
                           Muslim Status
                         </th>
+                        <th style={{ cursor: 'pointer' }}>
+                          Willing Status
+                        </th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -405,9 +440,9 @@ const CandidateDashboard = () => {
                         <tr key={candidate._id}>
                           <td>{index + 1}</td>
                           <td>
-                          <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
-                            {candidate.gender}
-                          </Badge>
+                            <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
+                              {candidate.gender}
+                            </Badge>
                           </td>
                           <td>{calculateAge(candidate.dob)}</td>
                           <td>{candidate.maritalStatus}</td>
@@ -420,7 +455,12 @@ const CandidateDashboard = () => {
                             {candidate.city}
                           </td>
                           <td>{candidate.muslimStatus}</td>
-
+                          <td>
+                            <Badge pill bg={candidate.willingStatus === 'Seeking' ? 'primary' : 'warning'}>
+                              {candidate.willingStatus}
+                            </Badge>
+                          </td>
+                          
                           <td>
                             <Button 
                               variant="light"
