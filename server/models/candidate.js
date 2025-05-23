@@ -28,6 +28,12 @@ const candidateSchema = new mongoose.Schema({
     enum: ["Below Matric", "Matric", "Inter", "Bachelors", "Masters", "Phd", "Aalim", "Other"], 
     required: true 
   },
+  willingStatus: { 
+    type: String, 
+    enum: ["Done", "Seeking", "On Hold"],
+    required: true,
+    default: 'Seeking'
+  },
   caste: { type: String },
   maslak: { 
     type: String, 
@@ -53,6 +59,10 @@ const candidateSchema = new mongoose.Schema({
   city: { type: String, required: true },
   address: { type: String, required: true },
   areaOfResidence: { type: String, required: true },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Create the model from the schema
