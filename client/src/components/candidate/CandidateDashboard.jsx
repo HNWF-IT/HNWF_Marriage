@@ -72,13 +72,14 @@ const CandidateDashboard = () => {
   }, [batch, willingStatus]);
 
   const filteredCandidates = candidates?.filter(candidate => {
+    const candidateAge = calculateAge(candidate.dob);
     return (
-      (!filters.minAge || candidate.age >= parseInt(filters.minAge)) &&
-      (!filters.maxAge || candidate.age <= parseInt(filters.maxAge)) &&
+      (!filters.minAge || candidateAge >= parseInt(filters.minAge)) &&
+      (!filters.maxAge || candidateAge <= parseInt(filters.maxAge)) &&
       (filters.gender === '' || candidate.gender === filters.gender) &&
       (filters.maritalStatus === '' || candidate.maritalStatus === filters.maritalStatus) &&
       (filters.qualification === '' || candidate.qualification === filters.qualification) &&
-      // candidate.city.toLowerCase().includes(filters.city.toLowerCase()) &&
+      candidate.city.toLowerCase().includes(filters.city.toLowerCase()) &&
       (filters.muslimStatus === '' || candidate.muslimStatus === filters.muslimStatus)
     );
   });
@@ -181,6 +182,7 @@ const CandidateDashboard = () => {
       const next = batch + 1;
       setBatch(next);
       fetchCandidates(next);
+      setCurrentPage(1);
     }
   };
 
@@ -189,6 +191,7 @@ const CandidateDashboard = () => {
       const prev = batch - 1;
       setBatch(prev);
       fetchCandidates(prev);
+      setCurrentPage(1);
     }
   };
 
@@ -379,7 +382,7 @@ const CandidateDashboard = () => {
                       </InputGroup.Text>
                       <Form.Select
                         value={willingStatus}
-                        onChange={(e) => { setWillingStatus(e.target.value); setBatch(1) }}
+                        onChange={(e) => { setWillingStatus(e.target.value); setBatch(1); setCurrentPage(1); }}
                       >
                         <option value="">All</option>
                         <option value="Seeking">Seeking</option>
