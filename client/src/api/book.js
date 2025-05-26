@@ -6,6 +6,7 @@ const BookAPI = {
   addBook: (data) => axiosInstance.post("/book/create", data),
   updateBook: (id, data) => axiosInstance.put(`/book/update/${id}`, data),
   deleteBook: (id) => axiosInstance.delete(`/book/${id}`),
+  checkoutBook: (payload) => axiosInstance.put("/book/checkout", payload),
 };
 
 export default BookAPI;
