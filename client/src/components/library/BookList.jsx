@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination } from 'react-bootstrap';
-import { Book, BookFill, CollectionFill, PeopleFill } from 'react-bootstrap-icons';
+import { Book, BookFill, BookmarkCheckFill, CollectionFill, PeopleFill } from 'react-bootstrap-icons';
 import BookAPI from '../../api/book';
 import { useEffect } from 'react';
 import BookModal from './BookModal';
 import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
 import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 import StatsCardRow from '../commons/stats/StatsCardRow';
+import CheckOutBookModal from './CheckOutBookModal';
+import { toast } from 'react-toastify';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [showBookModal, setShowBookModal] = useState(false);
+  const [showCheckOutModal, setShowCheckOutModal] = useState(false);
   const [mode, setMode] = useState('');
   const [selectedBook, setSelectedBook] = useState({});
   const [filters, setFilters] = useState({
@@ -22,7 +25,7 @@ const BookList = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(50);
 
   const [loading, setLoading] = useState(false);
 
@@ -108,6 +111,38 @@ const BookList = () => {
     }
   };
 
+  const handleBookCheckOut = (book) => {
+    setSelectedBook(book);
+    setShowCheckOutModal(true);
+  };
+
+  const handleCheckOutSubmit = async (payload) => {
+    try {
+        const response = await BookAPI.checkoutBook(payload);
+        if(response?.data?.success) {
+          const updatedBook = response?.data?.data;
+          if(updatedBook) {
+            setBooks(prevBooks =>
+              prevBooks.map(book =>
+                book._id === updatedBook._id ? updatedBook : book
+              )
+            );
+          }
+          
+          if(payload.mode === 'checkout') {
+            toast.success("Book assigned!!!");
+          } else {
+            toast.success("Book returned!!!");
+          }
+        } else {
+          toast.error("Book not assigned!!!");
+        }
+      } catch (error) {
+        const message = error?.message || "Something went wrong";
+        toast.error(message);
+      }
+  };
+
   const booksStats = [
     {
       icon: <Book size={40} className="text-warning" />,
@@ -124,11 +159,18 @@ const BookList = () => {
       textColor: "text-primary"
     },
     {
-      icon: <PeopleFill size={40} className="text-success" />,
-      label: "Checked Out",
-      value: books.filter(b => b.status === "Checked Out").length,
+      icon: <BookmarkCheckFill size={40} className="text-success" />,
+      label: "Reserved",
+      value: books.filter(b => b.status === "Reserved").length,
       bgColor: "bg-success-subtle",
       textColor: "text-success"
+    },
+    {
+      icon: <PeopleFill size={40} className="text-danger" />,
+      label: "Checked Out",
+      value: books.filter(b => b.status === "Checked Out").length,
+      bgColor: "bg-danger-subtle",
+      textColor: "text-danger"
     }
   ];
 
@@ -145,6 +187,14 @@ const BookList = () => {
         handleClose={handleBookModalClose}
         onBookAddOrUpdate={handleBookAddOrUpdate}
       /> : "" }
+
+      <CheckOutBookModal 
+        show={showCheckOutModal} 
+        onHide={() => setShowCheckOutModal(false)}
+        onSubmit={handleCheckOutSubmit}
+        book={selectedBook}
+        mode={selectedBook?.status === 'Checked Out' ? 'return' : 'checkout'}
+      />
 
       <Container fluid className="p-4 bg-light min-vh-100">
         <Card className="border-0 shadow-sm">
@@ -173,37 +223,6 @@ const BookList = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Stats cards */}
-            <StatsCardRow stats={booksStats} />
-
-            {/* Search */}
-            <Row className="mb-4">
-              <Col md={6}>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <i className="bi bi-search"></i>
-                  </InputGroup.Text>
-                  <Form.Control
-                    placeholder="Search by book title..."
-                    value={filters.title}
-                    onChange={(e) => handleFilterChange('title', e.target.value)}
-                  />
-                </InputGroup>
-              </Col>
-              <Col md={6}>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <i className="bi bi-person"></i>
-                  </InputGroup.Text>
-                  <Form.Control
-                    placeholder="Search by author..."
-                    value={filters.author}
-                    onChange={(e) => handleFilterChange('author', e.target.value)}
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
 
             {/* Filters */}
             <Collapse in={showFilters}>
@@ -266,6 +285,37 @@ const BookList = () => {
               </div>
             </Collapse>
 
+            {/* Stats cards */}
+            <StatsCardRow stats={booksStats} />
+
+            {/* Search */}
+            <Row className="mb-4">
+              <Col md={6}>
+                <InputGroup>
+                  <InputGroup.Text>
+                    <i className="bi bi-search"></i>
+                  </InputGroup.Text>
+                  <Form.Control
+                    placeholder="Search by book title..."
+                    value={filters.title}
+                    onChange={(e) => handleFilterChange('title', e.target.value)}
+                  />
+                </InputGroup>
+              </Col>
+              <Col md={6}>
+                <InputGroup>
+                  <InputGroup.Text>
+                    <i className="bi bi-person"></i>
+                  </InputGroup.Text>
+                  <Form.Control
+                    placeholder="Search by author..."
+                    value={filters.author}
+                    onChange={(e) => handleFilterChange('author', e.target.value)}
+                  />
+                </InputGroup>
+              </Col>
+            </Row>
+
             {/* Books Table */}
             <div className="table-responsive">
               <Table hover className="align-middle">
@@ -295,7 +345,13 @@ const BookList = () => {
                       <td>{book.genre}</td>
                       <td>{book.isbn}</td>
                       <td>
-                        <span className={`badge ${book.status === 'Available' ? 'bg-success' : 'bg-warning'}`}>
+                        <span className={`badge ${
+                          book.status === 'Available' ? 'bg-success' :
+                          book.status === 'Reserved' ? 'bg-warning' :
+                          book.status === 'Checked Out' ? 'bg-danger' :
+                          book.status === 'Lost' ? 'bg-secondary' :
+                          'bg-light text-dark' // default/fallback
+                        }`}>
                           {book.status}
                         </span>
                       </td>
@@ -315,7 +371,7 @@ const BookList = () => {
                         <Button 
                           variant="light" 
                           size="sm"
-                          onClick={() => alert(`Checkout book ${book.id}`)}
+                          onClick={() => handleBookCheckOut(book)}
                         >
                           <i className="bi bi-arrow-left-right"></i>
                         </Button>

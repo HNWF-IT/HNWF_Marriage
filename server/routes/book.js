@@ -94,4 +94,41 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+// Check Out a Book
+router.put('/checkout', async (req, res) => {
+  try {
+    const { bookId, borrowerInfo, mode } = req.body;
+
+    let updateFields = {};
+
+    if (mode === 'checkout') {
+      updateFields = {
+        borrowerInfo: JSON.stringify(borrowerInfo),
+        status: "Checked Out",
+      };
+    } else if (mode === 'return') {
+      updateFields = {
+        borrowerInfo: null,
+        status: "Available",
+      };
+    } else {
+      return res.status(400).json({ success: false, message: 'Invalid mode' });
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookId,
+      updateFields,
+      { new: true }
+    );
+
+    if (!updatedBook) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    return res.json({ success: true, message: 'Book status updated', data: updatedBook });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error updating book', data: err });
+  }
+});
+
 module.exports = router;

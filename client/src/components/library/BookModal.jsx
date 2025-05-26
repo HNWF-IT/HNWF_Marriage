@@ -4,9 +4,10 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import BookAPI from '../../api/book';
 import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
+import { PencilSquare, JournalPlus } from 'react-bootstrap-icons';
 
 const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => {
-  console.log("Book Data: ", bookData);
+  const isCreateMode = mode === 'add';
 
   const { 
     register, 
@@ -52,7 +53,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
   };
 
   const onSubmit = (newBook) => {
-    if (mode === 'add') {
+    if (isCreateMode) {
       BookAPI.addBook(newBook)
         .then((response) => {
           onBookAddOrUpdate(response.data.data, mode);
@@ -89,8 +90,15 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
       centered
       backdrop="static"
     >
-      <Modal.Header closeButton closeVariant="white" className="text-white" style={{backgroundColor: "#4C6C44"}}>
-        <Modal.Title>{mode === "edit" ? "Edit Book" : "Add New Book"}</Modal.Title>
+      <Modal.Header
+        closeButton
+        closeVariant="white"
+        className={isCreateMode ? 'bg-primary text-white' : 'bg-warning text-white'}
+      >
+        <Modal.Title>
+          {isCreateMode ? <JournalPlus className="me-2" /> : <PencilSquare className="me-2" />}  
+          {isCreateMode ? "Add New Book" : "Edit Book"}
+        </Modal.Title>
       </Modal.Header>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -103,7 +111,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
         >
           <div className="bg-white p-4 rounded shadow-sm">
             {/* Personal Information Section */}
-            <h5 className="mb-4" style={{color: "#A49559"}}>Basic Information</h5>
+            <h5 className="mb-4">Basic Information</h5>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -302,15 +310,15 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={closeModal} style={{backgroundColor: "#A49559"}}>
+          <Button onClick={closeModal} variant="secondary">
             Cancel
           </Button>
           <Button 
             type="submit" 
-            style={{backgroundColor: "#4C6C44"}}
+            variant={isCreateMode ? 'primary' : 'warning'}
             // disabled={!isDirty || !isValid}
           >
-            {mode === 'add' ? "Add" : "Update"}
+            {isCreateMode ? "Add" : "Update"}
           </Button>
         </Modal.Footer>
       </Form>
