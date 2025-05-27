@@ -119,7 +119,7 @@ const BookList = () => {
   const handleCheckOutSubmit = async (payload) => {
     try {
         const response = await BookAPI.checkoutBook(payload);
-        if(response?.data?.success) {
+        if(response.status === 200 && response?.data?.success) {
           const updatedBook = response?.data?.data;
           if(updatedBook) {
             setBooks(prevBooks =>
@@ -138,7 +138,11 @@ const BookList = () => {
           toast.error("Book not assigned!!!");
         }
       } catch (error) {
-        const message = error?.message || "Something went wrong";
+        let message = error.message || 'Something went wrong';
+        if(!error.response.data.success && error.response.data.message && error.status === 400) {
+          message = error.response.data.message;
+        }
+
         toast.error(message);
       }
   };
