@@ -15,9 +15,10 @@ const bookSchema = new mongoose.Schema({
   status: { 
     type: String, 
     enum: ["Available", "Checked Out", "Reserved", "Lost"], 
-    required: true 
+    required: true ,
+    default: "Available"
   },
-  shelfLocation: { type: String, required: true },
+  shelfLocation: { type: String },
   // Not needed. Need to remove in future
   language: { 
     type: String, 
@@ -25,7 +26,7 @@ const bookSchema = new mongoose.Schema({
     required: true 
   },
   // Not needed. Need to remove in future
-  pageCount: { type: String, required: true },
+  pageCount: { type: String },
   description: { type: String },
   borrowerInfo: { type: String }
 });

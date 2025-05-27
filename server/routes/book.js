@@ -14,6 +14,10 @@ router.post('/create', async (req, res) => {
 
     res.status(201).json({ success: true, message: 'Book created successfully', data: book });
   } catch (err) {
+    /*** Unique constraint (ISBN) violation error handling */
+    if(err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
+      return res.status(400).json({ success: false, message: 'Book not Added. Duplicate ISBN', data: {} });
+    }
     res.status(400).json({ success: false, message: 'Error creating book', data: err });
   }
 });
@@ -71,6 +75,10 @@ router.put('/update/:id', async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Book updated successfully', data: updatedBook });
   } catch (err) {
+    /*** Unique constraint (ISBN) violation error handling */
+    if(err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
+      return res.status(400).json({ success: false, message: 'Book Not Updated. Duplicate ISBN', data: {} });
+    }
     res.status(400).json({ success: false, message: 'Error updating book', data: err });
   }
 });
@@ -98,9 +106,14 @@ router.delete('/delete/:id', async (req, res) => {
 router.put('/checkout', async (req, res) => {
   try {
     const { bookId, borrowerInfo, mode } = req.body;
+    if(!borrowerInfo.fullName || 
+      !borrowerInfo.contactNumber || 
+      !borrowerInfo.issueDate || 
+      !borrowerInfo.dueDate) {
+      return res.status(400).json({ success: false, message: 'Missing Borrower Info', data: {} });  
+    }
 
     let updateFields = {};
-
     if (mode === 'checkout') {
       updateFields = {
         borrowerInfo: JSON.stringify(borrowerInfo),
@@ -112,7 +125,7 @@ router.put('/checkout', async (req, res) => {
         status: "Available",
       };
     } else {
-      return res.status(400).json({ success: false, message: 'Invalid mode' });
+      return res.status(400).json({ success: false, message: 'Invalid mode', data: {} });
     }
 
     const updatedBook = await Book.findByIdAndUpdate(
@@ -122,7 +135,7 @@ router.put('/checkout', async (req, res) => {
     );
 
     if (!updatedBook) {
-      return res.status(404).json({ error: 'Book not found' });
+      return res.status(404).json({ success: false, error: 'Book not found', data: {} });
     }
 
     return res.json({ success: true, message: 'Book status updated', data: updatedBook });

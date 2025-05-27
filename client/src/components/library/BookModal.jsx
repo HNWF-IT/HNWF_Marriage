@@ -27,7 +27,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
       genre: '',
       language: '',
       pageCount: '',
-      status: '',
+      status: BookStatus.AVAILABLE,
       shelfLocation: '',
       description: ''
     }
@@ -53,33 +53,30 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
   };
 
   const onSubmit = (newBook) => {
-    if (isCreateMode) {
-      BookAPI.addBook(newBook)
-        .then((response) => {
-          onBookAddOrUpdate(response.data.data, mode);
-          console.log("Response", response);
-          toast.success("Book added successfully");
-          closeModal();
-        })
-        .catch((error) => {
-          const message = error?.message || "Something went wrong";
-          toast.error(message);
-          closeModal();
-        });
-    } else {
-      BookAPI.updateBook(newBook._id, newBook)
-        .then((response) => {
-          onBookAddOrUpdate(response.data.data, mode);
-          console.log("Update Response: ", response);
-          toast.success("Book updated successfully");
-          closeModal();
-        })
-        .catch((error) => {
-          const message = error?.message || "Something went wrong";
-          toast.error(message);
-          closeModal();
-        });
-    }
+    closeModal();
+
+    const apiCall = isCreateMode
+      ? BookAPI.addBook(newBook)
+      : BookAPI.updateBook(newBook._id, newBook);
+
+    apiCall
+      .then((response) => {
+        onBookAddOrUpdate(response.data.data, mode);
+        toast.success(`Book ${isCreateMode ? 'added' : 'updated'} successfully`);
+      })
+      .catch((error) => {
+        let message = error.message || 'Something went wrong';
+
+        if (
+          error.response?.data?.success === false &&
+          error.response?.data?.message &&
+          error.status === 400
+        ) {
+          message = error.response.data.message;
+        }
+
+        toast.error(message);
+      });
   };
 
   return (
@@ -156,6 +153,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
                     placeholder="Enter ISBN"
                     isInvalid={!!errors.isbn}
                     {...register("isbn", {
+                      required: "ISBN is required",
                       validate: (value) =>
                         !value || value.length === 13 || "ISBN must be 13 characters"
                     })}
@@ -193,8 +191,14 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
                   <Form.Control
                     type="text"
                     placeholder="Enter publisher"
-                    {...register("publisher")}
+                    isInvalid={!!errors.publisher}
+                    {...register("publisher", {
+                      required: "Publication is required",
+                    })}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.publisher?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
 
@@ -246,7 +250,6 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
                     placeholder="Enter number of pages"
                     isInvalid={!!errors.pageCount}
                     {...register("pageCount", {
-                      required: "Page count is required",
                       min: { value: 1, message: "Page count must be at least 1" }
                     })}
                   />
@@ -256,36 +259,14 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
                 </Form.Group>
               </Col>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Status</Form.Label>
-                  <Form.Select
-                    isInvalid={!!errors.status}
-                    {...register("status", {
-                      required: "Status is required"
-                    })}
-                  >
-                    <option value="">Select status</option>
-                    {Object.values(BookStatus).map(lang => (
-                      <option key={lang} value={lang}>{lang}</option>
-                    ))}
-                  </Form.Select>
-                  <Form.Control.Feedback type="invalid">
-                    {errors.status?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-
-              <Col md={6}>
+              <Col md={12}>
                 <Form.Group className="mb-3">
                   <Form.Label>Shelf Location</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter shelf location"
                     isInvalid={!!errors.shelfLocation}
-                    {...register("shelfLocation", {
-                      required: "Shelf location is required"
-                    })}
+                    {...register("shelfLocation")}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.shelfLocation?.message}
