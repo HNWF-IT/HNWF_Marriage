@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-function validateRequest(req, res, next) {
+async function validateRequest(req, res, next) {
   const token = req.headers["Authorization"] || req.headers.authorization;
 
   // if the header is not present
@@ -12,6 +13,8 @@ function validateRequest(req, res, next) {
   try {
     userToken = jwt.verify(token, process.env.JWT_SECRET);
     res.user = userToken;
+
+    req.user = await User.findById(userToken.id).select('_id email');
     next();
   } catch (err) {
     return res

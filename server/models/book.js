@@ -28,7 +28,13 @@ const bookSchema = new mongoose.Schema({
   // Not needed. Need to remove in future
   pageCount: { type: String },
   description: { type: String },
-  borrowerInfo: { type: String }
+  borrowerInfo: { type: String },
+  
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  lastUpdatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+},
+{
+  timestamps: true // This adds createdAt and updatedAt automatically
 });
 
 // Create the model from the schema
