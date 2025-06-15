@@ -10,6 +10,7 @@ require("./db")({ connectToDb: true, initializeSeederFile: false });
 const { validateRequest } = require("./middlewares/auth");
 const candidateRoutes = require("./routes/candidate");
 const bookRoutes = require("./routes/book");
+const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
 
 const express = require("express");
@@ -28,6 +29,9 @@ app.use("/api/candidate", validateRequest, candidateRoutes);
 
 // Protected routes for books
 app.use("/api/book", validateRequest, bookRoutes);
+
+// Protected routes for books
+app.use("/api/users", validateRequest, userRoutes);
 
 // Public routes
 app.use("/api/auth", authRoutes);

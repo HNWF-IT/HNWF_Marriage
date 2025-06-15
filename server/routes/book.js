@@ -9,8 +9,13 @@ router.post('/create', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing book data', data: {} });
     }
 
-    const newBook = new Book({ ...req.body });
-    const book = await newBook.save();
+    const userId = req.user.id;
+    const book = new Book({
+      ...req.body,
+      createdBy: userId,
+      lastUpdatedBy: userId
+    });
+    await book.save();
 
     res.status(201).json({ success: true, message: 'Book created successfully', data: book });
   } catch (err) {
@@ -67,7 +72,15 @@ router.put('/update/:id', async (req, res) => {
       });
     }
 
-    const updatedBook = await Book.findByIdAndUpdate(id, updateData, { new: true });
+    const userId = req.user.id;
+    const updatedBook = await Book.findByIdAndUpdate(
+      req.params.id,
+      {
+        updateData,
+        lastUpdatedBy: userId
+      },
+      { new: true }
+    );
 
     if (!updatedBook) {
       return res.status(404).json({ success: false, message: 'Book not found', data: {} });

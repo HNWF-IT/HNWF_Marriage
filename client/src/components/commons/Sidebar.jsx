@@ -7,6 +7,7 @@ const Sidebar = ({ activeMainTabIndex, setActiveMainTabIndex, sidebarOpen, toggl
 
   const navLinks = [
     { name: "Dashboard", short: "D", path: "/dashboard" },
+    { name: "Users", short: "A", path: "/users" },
     { name: "Marriage", short: "M", path: "/marriage" },
     { name: "Library", short: "L", path: "/library" },
   ];
