@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, Spinner, Alert, CloseButton } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthAPI from '../../api/auth';
 import { useNavigate } from 'react-router-dom';
@@ -12,27 +12,50 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState({ email: false, password: false });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Authentication logic would go here
-    const response = await AuthAPI.login({ email, password, rememberMe });
-    console.log('Login response:', response);
     
-    /*** 
-     * Saving token in Browser's Cookie
-     * path=/ => This ensures that the cookie is available on all routes
-     * max-age=3600 =>	This ensures that the cookie will expire in 1 hour
-     *  3600 = 1 hour
-     *  86400 = 1 day
-    */
-    document.cookie = `token=${response.data.data}; path=/; max-age=3600`;
+    // Clear previous messages
+    setError('');
+    setIsLoading(true);
 
-    resetFields();
-    // TODO: NOT THE BEST APPROACH.. NEED TO IMPROVE!!
-    window.location.pathname = '/dashboard';
-    // navigate('/dashboard');
+    try {
+      // Authentication logic
+      const response = await AuthAPI.login({ email, password, rememberMe });
+      
+      /*** 
+       * Saving token in Browser's Cookie
+       * path=/ => This ensures that the cookie is available on all routes
+       * max-age=3600 =>	This ensures that the cookie will expire in 1 hour
+       *  3600 = 1 hour
+       *  86400 = 1 day
+      */
+      document.cookie = `token=${response.data.data}; path=/; max-age=3600`;
+      
+      resetFields();
+      
+      // Add a small delay to show success message before redirect
+      setTimeout(() => {
+        // TODO: NOT THE BEST APPROACH.. NEED TO IMPROVE!!
+        window.location.pathname = '/dashboard';
+        // navigate('/dashboard');
+      }, 1500);
+      
+    } catch (err) {
+      // Handle login errors
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          'Login failed. Please check your credentials and try again.';
+      setError(errorMessage);
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setIsLoading(false);
+      resetFields();
+    }
   };
 
   const resetFields = () => {
@@ -55,6 +78,8 @@ const Login = () => {
         position: 'relative',
       }}
     >
+
+
       {/* Overlay to darken the background slightly */}
       <div 
         style={{
@@ -111,6 +136,26 @@ const Login = () => {
                 <h4 className="mb-1 fw-bold">Login</h4>
                 <p className="text-muted small mb-4">Sign in to your account to continue</p>
 
+                {/* Error Alert */}
+                {error && (
+                  <Alert
+                    variant="danger"
+                    style={{
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 0.75rem',
+                      marginBottom: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center', // align text and close button vertically
+                    }}
+                  >
+                    <div style={{ flexGrow: 1 }}>{error}</div>
+                    <CloseButton
+                      onClick={() => setError('')}
+                      style={{ marginLeft: '0.75rem', marginTop: '0.1rem' }}
+                    />
+                  </Alert>
+                )}
+
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
                     <Form.Label className="small fw-medium">Email Address</Form.Label>
@@ -121,6 +166,7 @@ const Login = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       onFocus={() => setIsFocused({...isFocused, email: true})}
                       onBlur={() => setIsFocused({...isFocused, email: false})}
+                      disabled={isLoading}
                       style={{
                         borderRadius: '6px',
                         padding: '10px 12px',
@@ -128,7 +174,8 @@ const Login = () => {
                           ? '0 0 0 3px rgba(60, 110, 48, 0.25)' 
                           : 'none',
                         border: isFocused.email ? '1px solid #3c6e30' : '1px solid #ced4da',
-                        transition: 'all 0.2s ease-in-out'
+                        transition: 'all 0.2s ease-in-out',
+                        opacity: isLoading ? 0.7 : 1
                       }}
                       required
                     />
@@ -143,6 +190,7 @@ const Login = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       onFocus={() => setIsFocused({...isFocused, password: true})}
                       onBlur={() => setIsFocused({...isFocused, password: false})}
+                      disabled={isLoading}
                       style={{
                         borderRadius: '6px',
                         padding: '10px 12px',
@@ -150,7 +198,8 @@ const Login = () => {
                           ? '0 0 0 3px rgba(60, 110, 48, 0.25)' 
                           : 'none',
                         border: isFocused.password ? '1px solid #3c6e30' : '1px solid #ced4da',
-                        transition: 'all 0.2s ease-in-out'
+                        transition: 'all 0.2s ease-in-out',
+                        opacity: isLoading ? 0.7 : 1
                       }}
                       required
                     />
@@ -161,18 +210,23 @@ const Login = () => {
                       href="#" 
                       className="text-decoration-none small"
                       style={{
-                        color: '#3c6e30',
+                        color: isLoading ? '#999' : '#3c6e30',
                         fontWeight: '500',
                         transition: 'color 0.3s ease, transform 0.2s ease',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        pointerEvents: isLoading ? 'none' : 'auto'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.color = '#2b5022';
-                        e.target.style.transform = 'translateX(2px)';
+                        if (!isLoading) {
+                          e.target.style.color = '#2b5022';
+                          e.target.style.transform = 'translateX(2px)';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.color = '#3c6e30';
-                        e.target.style.transform = 'translateX(0)';
+                        if (!isLoading) {
+                          e.target.style.color = '#3c6e30';
+                          e.target.style.transform = 'translateX(0)';
+                        }
                       }}
                     >
                       Forgot your password?
@@ -182,29 +236,53 @@ const Login = () => {
                   <Button 
                     variant="success" 
                     type="submit" 
-                    className="w-100 py-2 fw-medium"
+                    className="w-100 py-2 fw-medium d-flex align-items-center justify-content-center"
+                    disabled={isLoading}
                     style={{
-                      backgroundColor: '#3c6e30',
+                      backgroundColor: isLoading ? '#6c757d' : '#3c6e30',
                       border: 'none',
                       borderRadius: '6px',
                       transition: 'all 0.2s ease-in-out',
-                      boxShadow: '0 2px 10px rgba(60, 110, 48, 0.3)',
+                      boxShadow: isLoading ? 'none' : '0 2px 10px rgba(60, 110, 48, 0.3)',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      minHeight: '42px'
                     }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2b5022'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3c6e30'}
+                    onMouseEnter={(e) => {
+                      if (!isLoading) e.target.style.backgroundColor = '#2b5022'
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isLoading) e.target.style.backgroundColor = '#3c6e30'
+                    }}
                     onMouseDown={(e) => {
-                      e.target.style.transform = 'scale(0.98)';
-                      e.target.style.boxShadow = '0 1px 5px rgba(60, 110, 48, 0.3)';
+                      if (!isLoading) {
+                        e.target.style.transform = 'scale(0.98)';
+                        e.target.style.boxShadow = '0 1px 5px rgba(60, 110, 48, 0.3)';
+                      }
                     }}
                     onMouseUp={(e) => {
-                      e.target.style.transform = 'scale(1)';
-                      e.target.style.boxShadow = '0 2px 10px rgba(60, 110, 48, 0.3)';
+                      if (!isLoading) {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.boxShadow = '0 2px 10px rgba(60, 110, 48, 0.3)';
+                      }
                     }}
-                    onClick={handleSubmit}
                   >
-                    Login
+                    {isLoading ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-2"
+                          style={{ width: '16px', height: '16px' }}
+                        />
+                        Logging in...
+                      </>
+                    ) : (
+                      'Login'
+                    )}
                   </Button>
 
                   <div className="text-center mt-4">
@@ -212,13 +290,18 @@ const Login = () => {
                       Don't have an account? <a 
                         href="#" 
                         style={{ 
-                          color: '#3c6e30', 
+                          color: isLoading ? '#999' : '#3c6e30', 
                           textDecoration: 'none',
                           fontWeight: '500',
-                          transition: 'color 0.3s ease' 
+                          transition: 'color 0.3s ease',
+                          pointerEvents: isLoading ? 'none' : 'auto'
                         }}
-                        onMouseEnter={(e) => e.target.style.color = '#2b5022'}
-                        onMouseLeave={(e) => e.target.style.color = '#3c6e30'}
+                        onMouseEnter={(e) => {
+                          if (!isLoading) e.target.style.color = '#2b5022'
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isLoading) e.target.style.color = '#3c6e30'
+                        }}
                       >
                         Sign up
                       </a>
