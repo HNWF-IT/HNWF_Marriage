@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const { signUpSchema } = require('../schemas/user');
 
 // Create a new user
 router.post('/create', async (req, res) => {
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({ success: false, message: 'Missing user data', data: {} });
-    }
+    // Validate user
+    await signUpSchema.validate(req.body, { abortEarly: true });
 
     const newUser = new User({ ...req.body });
     const user = await newUser.save();

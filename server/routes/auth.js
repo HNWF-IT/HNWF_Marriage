@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 
 router.post("/login", async (req, res) => {
-  const { email, password, rememberMe } = req.body;
-
   if (!email || !password || typeof rememberMe != 'boolean') {
     return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
   }
@@ -31,33 +29,6 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.log('Error:', error)
     res.status(500).json({ success: false, message: "Server error", data: error });
-  }
-});
-
-router.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Missing email or password", data: {} });
-  }
-
-  try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists", data: {} });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
-    const newUser = new User({ email, password: hashedPassword });
-    await newUser.save();
-
-    res.status(201).json({ success: true, message: "User created successfully", data: newUser });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", data: {} });
   }
 });
 
