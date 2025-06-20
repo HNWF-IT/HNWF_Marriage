@@ -36,6 +36,11 @@ app.use("/api/users", userRoutes);
 // Public routes
 app.use("/api/auth", authRoutes);
 
+// Test routes
+app.get('/envs', (req, res) => {
+  res.send(process.env);
+});
+
 // Start the server
 app.listen(PORT, () =>
   console.log(`[1/2] | 🚀🚀 Server Started - Port: ${PORT}`)
