@@ -17,12 +17,11 @@ const express = require("express");
 const app = express();
 
 // Middleware for handling JSON.
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-  })
-);
-app.use(express.json());
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+app.options('*', cors()); 
 
 // Protected routes for candidates
 app.use("/api/candidate", validateRequest, candidateRoutes);
