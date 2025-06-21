@@ -3,21 +3,21 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
+const { loginSchema } = require("../schemas/user");
 
 router.post("/login", async (req, res) => {
-  if (!email || !password || typeof rememberMe != 'boolean') {
-    return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
-  }
-
   try {
+    // Validate user
+    await loginSchema.validate(req.body, { abortEarly: true });
+
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid credentials", data: {} });
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: "Invalid credentials", data: {} });
     }
