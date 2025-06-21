@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const { signUpSchema } = require('../schemas/user');
+const bcrypt = require('bcryptjs');
 
 // Create a new user
 router.post('/create', async (req, res) => {
