@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
   },
   appPermission: {
     type: [String],
+    enum: ['marriage', 'library'],
     default: []
   }
 });

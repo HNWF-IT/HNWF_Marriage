@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 
 router.post("/login", async (req, res) => {
-  const { email, password, rememberMe } = req.body;
-
   if (!email || !password || typeof rememberMe != 'boolean') {
     return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
   }
