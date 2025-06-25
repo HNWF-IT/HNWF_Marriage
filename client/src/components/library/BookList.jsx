@@ -213,7 +213,7 @@ const BookList = () => {
                   onClick={() => handleBookModalShow('add', {})}
                 >
                   <i className="bi bi-plus"></i>
-                  Add Book
+                  Add
                 </Button>
 
                 <Button 
@@ -339,7 +339,7 @@ const BookList = () => {
                 <tbody>
                   {currentPageBooks.map((book, index) => (
                     <tr key={book.id}>
-                      <td>{index + 1}</td>
+                      <td>{(((currentPage - 1) * 50) + (index + 1))}</td>
                       <td>
                         <BookFill className="me-2" />
                         {book.title}

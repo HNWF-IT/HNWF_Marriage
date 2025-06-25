@@ -1,6 +1,6 @@
+// models/user.js
 const mongoose = require("mongoose");
 
-// Define the user schema
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -9,23 +9,24 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false  // ⬅ always exclude unless explicitly selected
   },
   status: {
     type: Boolean,
-    required: true
+    default: true
   },
   phoneNo: {
     type: String,
     required: true
   },
-  username: {
+  fullname: {
     type: String,
     required: true
   },
   role: {
     type: String,
-    enum: ['admin', 'user', 'member'],
+    enum: ['admin', 'member'],
     required: true
   },
   appPermission: {
@@ -34,8 +35,4 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Create the model from the schema
-const User = mongoose.model('User', userSchema);
-
-// Export the model
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
