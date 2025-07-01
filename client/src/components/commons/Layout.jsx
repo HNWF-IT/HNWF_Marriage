@@ -7,11 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import "../../assets/css/candidateStyle.css"
 import isLoggedIn from "../../utils";
 import Login from "../login/Login";
+import { useAuth } from "../../context/AuthContext";
 
 const MainContent = () => {
   const [activeMainTabIndex, setActiveMainTabIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
+  const { logout } = useAuth();
 
   const colors = {
     primary: "#4C6C44",
@@ -36,9 +38,8 @@ const MainContent = () => {
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   const handleLogout = () => {
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+    logout();
     window.location.pathname = "/login";
-    sessionStorage.removeItem("candidates");
   }
 
   return (

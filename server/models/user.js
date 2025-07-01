@@ -1,5 +1,6 @@
 // models/user.js
 const mongoose = require("mongoose");
+const { APP_PERMISSIONS } = require("../utils/constants");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -29,9 +30,11 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'member'],
     required: true
   },
-  appPermission: {
-    type: [String],
-    enum: ['marriage', 'library'],
+  appPermissions: {
+    type: [{
+      type: String,
+      enum: APP_PERMISSIONS
+    }],
     default: []
   }
 });

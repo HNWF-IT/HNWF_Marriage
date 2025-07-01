@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 
 router.post("/login", async (req, res) => {
+  const {email, password, rememberMe} = req.body;
+
   if (!email || !password || typeof rememberMe != 'boolean') {
     return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
   }
@@ -34,9 +36,10 @@ router.post("/login", async (req, res) => {
           token,
           user: {
             id: user._id,
-            name: user.name,
+            name: user.fullname,
             email: user.email,
-            role: user.role
+            role: user.role,
+            appPermissions: user.appPermissions
           }
         } 
       });
@@ -51,6 +54,11 @@ router.post("/signup", async (req, res) => {
 
   if (!userData.email || !userData.password) {
     return res.status(400).json({ success: false, message: "Missing email or password", data: {} });
+  }
+
+  // use all permissions for admin
+  if (userData.role === 'admin') {
+    userData.appPermission = [...APP_PERMISSIONS];
   }
 
   try {

@@ -7,6 +7,7 @@ import UserTable from './UserTable';
 import UserModal from './UserModal';
 import UserAPI from '../../api/user';
 import { toast } from 'react-toastify';
+import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -83,6 +84,10 @@ const AdminUserManagement = () => {
     const matchesStatus = filterStatus === 'All' || (filterStatus === 'Active' ? user.status : !user.status);
     return matchesSearch && matchesStatus;
   });
+
+  if(loading) {
+    return <PulseDotLoader />
+  }
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">

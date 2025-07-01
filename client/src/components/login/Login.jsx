@@ -39,8 +39,6 @@ const Login = () => {
 
       const { token, user } = response.data.data;
       login(user, token);
-      document.cookie = `token=${response.data.data}; path=/; max-age=3600`;
-      
       resetFields();
       
       // Add a small delay to show success message before redirect

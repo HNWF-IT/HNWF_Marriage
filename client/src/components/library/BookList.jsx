@@ -36,7 +36,6 @@ const BookList = () => {
         const response = await BookAPI.getAllBooks();
         if(response.data.success && response.data.data) {
           setBooks(response.data.data);
-          // sessionStorage.setItem('candidates', JSON.stringify(response.data.data));
         }
       } catch (error) {
         const message = error?.message || "Something went wrong";
@@ -47,12 +46,6 @@ const BookList = () => {
       }
     };
   
-    // const cached = sessionStorage.getItem('candidates');
-    // if (cached) {
-    //   setCandidates(JSON.parse(cached));
-    // } else {
-    //   fetchCandidates();
-    // }
     fetchBooks();
   }, []);
 

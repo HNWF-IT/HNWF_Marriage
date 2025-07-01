@@ -3,7 +3,7 @@ export default function isLoggedIn() {
     // HAVING THE REAL SECRET KEY!
 
     // TODO: Imporve this function!
-    if (document.cookie != '') {
+    if (localStorage.getItem("token")) {
         return true;
     }
     return false;

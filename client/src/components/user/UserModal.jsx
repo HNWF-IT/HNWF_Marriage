@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { PencilSquare, PersonPlus } from 'react-bootstrap-icons';
 import UserAPI from '../../api/user';
 import AuthAPI from '../../api/auth';
+import { APP_PERMISSIONS } from '../../utils/constants';
 
 const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpdate }) => {
   const isCreateMode = useMemo(() => mode === 'add', [mode]);
@@ -28,7 +29,7 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
       role: '',
       phoneNo: '',
       status: true,
-      permissions: [],
+      appPermissions: [],
     },
   });
 
@@ -186,19 +187,19 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
                 <Form.Group className="mb-3">
                   <Form.Label>App Permissions</Form.Label>
                   <div>
-                    {['marriage', 'library'].map((app) => (
+                    {APP_PERMISSIONS.map((app) => (
                       <Form.Check
                         key={app}
                         type="checkbox"
                         label={app.charAt(0).toUpperCase() + app.slice(1)}
                         value={app}
-                        {...register('permissions', {
+                        {...register('appPermissions', {
                           validate: (value) => value?.length > 0 || 'At least one app permission must be selected',
                         })}
                       />
                     ))}
                   </div>
-                  {errors.permissions && <Form.Text className="text-danger">{errors.permissions.message}</Form.Text>}
+                  {errors.appPermissions && <Form.Text className="text-danger">{errors.appPermissions.message}</Form.Text>}
                 </Form.Group>
               </Col>
             </Row>
