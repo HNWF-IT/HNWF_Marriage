@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
+const { APP_PERMISSIONS } = require("../utils/constants");
 
 router.post("/login", async (req, res) => {
   const {email, password, rememberMe} = req.body;
@@ -58,14 +59,14 @@ router.post("/signup", async (req, res) => {
 
   // use all permissions for admin
   if (userData.role === 'admin') {
-    userData.appPermission = [...APP_PERMISSIONS];
+    userData.appPermissions = [...APP_PERMISSIONS];
   }
 
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ email: userData.email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists", data: {} });
+      return res.status(400).json({ success: false, message: "Email is already registered", data: {} });
     }
 
     // Hash password

@@ -1,12 +1,18 @@
 // --- UserTable.js ---
 
 import React from 'react';
-import { Badge, Card, Dropdown, Table } from 'react-bootstrap';
+import { Badge, Button, Card, Dropdown, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import {
+  ArrowRepeat,
+  ChatFill,
   Envelope,
+  EyeFill,
   GeoAlt,
+  KeyFill,
   PencilSquare,
   PersonFill,
+  PersonSlash,
+  PersonX,
   Telephone,
   ThreeDotsVertical,
   Trash,
@@ -75,26 +81,117 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                   </td>
                   <td className="py-3">{getStatusBadge(user.status)}</td>
                   <td className="py-3">
-                    <Dropdown align="end">
-                      <Dropdown.Toggle variant="outline-secondary" size="sm" className="border-0">
-                        <ThreeDotsVertical />
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => onUserModalShow('edit', user)}>
-                          <PencilSquare className="me-2" size={14} /> Edit User
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item
-                          className="text-danger"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowDeleteModal(true);
-                          }}
+                    <div style={{ width: 'fit-content' }}>
+                      {/* First Row - Deactivate and Reset Password */}
+                      <div className="d-flex gap-1 mb-1">
+                        {/* Deactivate Account Button */}
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={<Tooltip>Deactivate Account</Tooltip>}
                         >
-                          <Trash className="me-2" size={14} /> Delete User
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                          <Button
+                            size="sm"
+                            variant="outline-warning"
+                            className="p-1 d-flex align-items-center justify-content-center"
+                            style={{ 
+                              width: '28px', 
+                              height: '28px',
+                              border: '1px solid #ffc107',
+                              borderRadius: '6px'
+                            }}
+                            onClick={() => handleDeactivateUser(user)}
+                          >
+                            <PersonSlash size={12} />
+                          </Button>
+                        </OverlayTrigger>
+
+                        {/* Reset Password Button */}
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={<Tooltip>Reset Password</Tooltip>}
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline-info"
+                            className="p-1 d-flex align-items-center justify-content-center"
+                            style={{ 
+                              width: '28px', 
+                              height: '28px',
+                              border: '1px solid #0dcaf0',
+                              borderRadius: '6px'
+                            }}
+                            onClick={() => handleResetPassword(user)}
+                          >
+                            <KeyFill size={12} />
+                          </Button>
+                        </OverlayTrigger>
+                      </div>
+
+                      {/* Second Row - More Options and Edit User */}
+                      <div className="d-flex gap-1">
+                        {/* Edit User Button */}
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={<Tooltip>Edit User</Tooltip>}
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline-success"
+                            className="p-1 d-flex align-items-center justify-content-center"
+                            style={{ 
+                              width: '28px', 
+                              height: '28px',
+                              border: '1px solid #198754',
+                              borderRadius: '6px'
+                            }}
+                            onClick={() => onUserModalShow('edit', user)}
+                          >
+                            <PencilSquare size={12} />
+                          </Button>
+                        </OverlayTrigger>
+
+                        {/* More Options Button */}
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={<Tooltip>More Options</Tooltip>}
+                        >
+                          <Dropdown align="end">
+                            <Dropdown.Toggle
+                              as={Button}
+                              size="sm"
+                              variant="outline-secondary"
+                              className="p-1 d-flex align-items-center justify-content-center border-0"
+                              style={{ 
+                                width: '28px', 
+                                height: '28px',
+                                border: '1px solid #6c757d',
+                                borderRadius: '6px'
+                              }}
+                            >
+                              <ThreeDotsVertical size={12} />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => handleViewProfile(user)}>
+                                <EyeFill className="me-2" size={14} /> View Profile
+                              </Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleSendMessage(user)}>
+                                <ChatFill className="me-2" size={14} /> Send Message
+                              </Dropdown.Item>
+                              <Dropdown.Divider />
+                              <Dropdown.Item
+                                className="text-danger"
+                                onClick={() => {
+                                  setSelectedUser(user);
+                                  setShowDeleteModal(true);
+                                }}
+                              >
+                                <Trash className="me-2" size={14} /> Delete User
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </OverlayTrigger>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ))}
