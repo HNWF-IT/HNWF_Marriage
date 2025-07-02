@@ -1,44 +1,45 @@
-import React, { useEffect } from 'react';
+// --- UserModal.js ---
+
+import React, { useEffect, useMemo } from 'react';
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import BookAPI from '../../api/book';
-import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
 import { PencilSquare, PersonPlus } from 'react-bootstrap-icons';
+import UserAPI from '../../api/user';
+import AuthAPI from '../../api/auth';
+import { APP_PERMISSIONS } from '../../utils/constants';
 
 const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpdate }) => {
-  console.log("User Data: ", userData);
-  const isCreateMode = React.useMemo(() => mode === 'add', [mode]);
+  const isCreateMode = useMemo(() => mode === 'add', [mode]);
 
-  const { 
-    register, 
-    handleSubmit, 
+  const {
+    register,
+    handleSubmit,
     reset,
-    formState: { errors, isDirty, isValid },
     setValue,
-    watch
+    watch,
+    formState: { errors },
   } = useForm({
     mode: 'onChange',
     defaultValues: {
       fullname: '',
       email: '',
+      password: '',
+      confirmPassword: '',
       role: '',
-      phoneNumber: '',
-      status: '',
-    }
+      phoneNo: '',
+      status: true,
+      appPermissions: [],
+    },
   });
 
-  // Reset form when userData changes
   useEffect(() => {
     if (userData) {
-      // Set all values from userData
       Object.entries(userData).forEach(([key, value]) => {
-        if(key === 'dob') {
-          setValue(key, userData?.dob.split("T")[0])
-        } else setValue(key, value);
+        setValue(key, key === 'dob' ? value?.split('T')[0] : value);
       });
     } else {
-      reset(); // Reset to default values
+      reset();
     }
   }, [userData, reset, setValue]);
 
@@ -48,44 +49,31 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
   };
 
   const onSubmit = (newUser) => {
-    /*
-    if (mode === 'add') {
-      BookAPI.addBook(newBook)
-        .then((response) => {
-          onBookAddOrUpdate(response.data.data, mode);
-          console.log("Response", response);
-          toast.success("Book added successfully");
-          closeModal();
-        })
-        .catch((error) => {
-          const message = error?.message || "Something went wrong";
-          toast.error(message);
-          closeModal();
-        });
-    } else {
-      BookAPI.updateBook(newBook._id, newBook)
-        .then((response) => {
-          onBookAddOrUpdate(response.data.data, mode);
-          console.log("Update Response: ", response);
-          toast.success("Book updated successfully");
-          closeModal();
-        })
-        .catch((error) => {
-          const message = error?.message || "Something went wrong";
-          toast.error(message);
-          closeModal();
-        });
-    }
-    */
+    const action = isCreateMode ? AuthAPI.signup : () => UserAPI.updateUser(userData._id, newUser);
+    action(newUser)
+      .then((response) => {
+        onUserAddOrUpdate(response.data.data, mode);
+        toast.success(isCreateMode ? 'New account created successfully' : 'Account updated successfully');
+        closeModal();
+      })
+      .catch((error) => {
+        const errorCode = error?.response?.data?.code;
+
+        if (errorCode === 11000) {
+          toast.error('Email already exists. Please use a different one.');
+        } else {
+          const serverMessage =
+            error?.response?.data?.message || error?.message || 'Something went wrong';
+          toast.error(serverMessage);
+        }
+
+        closeModal();
+      });
   };
 
   return (
-    <Modal show={show} onHide={closeModal} size="lg" centered backdrop="static" onExited={onExited} >
-      <Modal.Header
-        closeButton
-        className={isCreateMode ? 'bg-primary text-white' : 'bg-warning text-white'}
-        closeVariant="white"
-      >
+    <Modal show={show} onHide={closeModal} size="lg" centered backdrop="static" onExited={onExited}>
+      <Modal.Header closeButton className={isCreateMode ? 'bg-primary text-white' : 'bg-warning text-white'} closeVariant="white">
         <Modal.Title>
           {isCreateMode ? <PersonPlus className="me-2" /> : <PencilSquare className="me-2" />}
           {isCreateMode ? 'Create New User' : 'Edit User'}
@@ -93,16 +81,9 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
       </Modal.Header>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Modal.Body 
-            className="bg-light"
-            style={{
-                maxHeight: "70vh",
-                overflowY: "auto",
-              }}
-        >
+        <Modal.Body className="bg-light" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           <div className="bg-white p-4 rounded shadow-sm">
-            {/* Personal Information Section */}
-            <h5 className="mb-4" style={{color: "grey"}}>Basic Information</h5>
+            <h5 className="mb-4" style={{ color: 'grey' }}>Basic Information</h5>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -111,17 +92,12 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
                     type="text"
                     placeholder="Enter full name"
                     isInvalid={!!errors.fullname}
-                    {...register("fullName", {
-                      required: "Full name is required",
-                      minLength: {
-                        value: 2,
-                        message: "Full name must be at least 2 characters"
-                      }
+                    {...register('fullname', {
+                      required: 'Full name is required',
+                      minLength: { value: 2, message: 'Full name must be at least 2 characters' },
                     })}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.fullname?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">{errors.fullname?.message}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
 
@@ -132,95 +108,110 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
                     type="email"
                     placeholder="Enter email"
                     isInvalid={!!errors.email}
-                    {...register("email", {
-                      required: "Email is required",
+                    {...register('email', {
+                      required: 'Email is required',
                       pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "Invalid email format"
-                      }
+                        message: 'Invalid email format',
+                      },
                     })}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
 
               <Col md={6}>
-                  <Form.Group className="mb-3">
-                      <Form.Label>Role</Form.Label>
-                      <Form.Select
-                          isInvalid={!!errors.role}
-                          {...register("role", { required: "Role is required" })}
-                      >
-                          <option value="">Select Role</option>
-                          <option value="Employee">Employee</option>
-                          <option value="Manager">Manager</option>
-                          <option value="Admin">Admin</option>
-                      </Form.Select>
-                      <Form.Control.Feedback type="invalid">
-                          {errors.role?.message}
-                      </Form.Control.Feedback>
-                  </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Enter password"
+                    isInvalid={!!errors.password}
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                    })}
+                  />
+                  <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+                </Form.Group>
               </Col>
 
               <Col md={6}>
-                  <Form.Group className="mb-3">
+                <Form.Group className="mb-3">
+                  <Form.Label>Confirm Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Confirm password"
+                    isInvalid={!!errors.confirmPassword}
+                    {...register('confirmPassword', {
+                      required: 'Please confirm your password',
+                      validate: (value) => value === watch('password') || 'Passwords do not match',
+                    })}
+                  />
+                  <Form.Control.Feedback type="invalid">{errors.confirmPassword?.message}</Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Role</Form.Label>
+                  <Form.Select isInvalid={!!errors.role} {...register('role', { required: 'Role is required' })}>
+                    <option value="">Select Role</option>
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">{errors.role?.message}</Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+
+              <Col md={6}>
+                <Form.Group className="mb-3">
                   <Form.Label>Phone Number</Form.Label>
                   <Form.Control
-                      type="tel"
-                      placeholder="Enter phone number"
-                      isInvalid={!!errors.phone}
-                      {...register("phone", {
-                      required: "Phone number is required",
+                    type="tel"
+                    placeholder="Enter phone number"
+                    isInvalid={!!errors.phoneNo}
+                    {...register('phoneNo', {
+                      required: 'Phone number is required',
                       pattern: {
-                          value: /^[0-9]{10,15}$/,
-                          message: "Phone number must be 10-15 digits"
-                      }
-                      })}
+                        value: /^[0-9]{10,15}$/,
+                        message: 'Phone number must be 10-15 digits',
+                      },
+                    })}
                   />
-                  <Form.Control.Feedback type="invalid">
-                      {errors.phone?.message}
-                  </Form.Control.Feedback>
-                  </Form.Group>
+                  <Form.Control.Feedback type="invalid">{errors.phoneNo?.message}</Form.Control.Feedback>
+                </Form.Group>
               </Col>
 
-              <Col md={6}>
-                  <Form.Group className="mb-3">
-                      <Form.Label>Status</Form.Label>
-                      <Form.Select
-                          isInvalid={!!errors.status}
-                          {...register("status", { required: "Status is required" })}
-                      >
-                          <option value="">Select Status</option>
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                      </Form.Select>
-                      <Form.Control.Feedback type="invalid">
-                          {errors.status?.message}
-                      </Form.Control.Feedback>
-                  </Form.Group>
+              <Col md={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>App Permissions</Form.Label>
+                  <div>
+                    {APP_PERMISSIONS.map((app) => (
+                      <Form.Check
+                        key={app}
+                        type="checkbox"
+                        label={app.charAt(0).toUpperCase() + app.slice(1)}
+                        value={app}
+                        {...register('appPermissions', {
+                          validate: (value) => value?.length > 0 || 'At least one app permission must be selected',
+                        })}
+                      />
+                    ))}
+                  </div>
+                  {errors.appPermissions && <Form.Text className="text-danger">{errors.appPermissions.message}</Form.Text>}
+                </Form.Group>
               </Col>
             </Row>
-
           </div>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            onClick={closeModal} 
-            // style={{backgroundColor: "#A49559"}}
-            variant="secondary"
-          >
+          <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            variant={isCreateMode ? 'primary' : 'warning'}
-            // style={{backgroundColor: "#4C6C44"}}
-            // disabled={!isDirty || !isValid}
-          >
-            {mode === 'add' ? "Add" : "Update"}
+          <Button type="submit" variant={isCreateMode ? 'primary' : 'warning'}>
+            {isCreateMode ? 'Add' : 'Update'}
           </Button>
         </Modal.Footer>
       </Form>

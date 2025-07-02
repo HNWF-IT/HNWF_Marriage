@@ -2,12 +2,15 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 async function validateRequest(req, res, next) {
-  const token = req.headers["Authorization"] || req.headers.authorization;
+  const authToken = req.headers["Authorization"] || req.headers.authorization;
 
   // if the header is not present
-  if (!token) {
+   if (!authToken || !authToken.startsWith("Bearer ")) {
     return res.status(401).json({ success: false, message: "Token missing", data: {} });
   }
+
+  // Remove "Bearer " prefix
+  const token = authToken.split(" ")[1];
 
   let userToken = null;
   try {

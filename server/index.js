@@ -31,7 +31,7 @@ app.use("/api/candidate", validateRequest, candidateRoutes);
 app.use("/api/book", validateRequest, bookRoutes);
 
 // Protected routes for books
-app.use("/api/users", userRoutes);
+app.use("/api/user", validateRequest, userRoutes);
 
 // Public routes
 app.use("/api/auth", authRoutes);

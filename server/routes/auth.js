@@ -4,14 +4,22 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 const { loginSchema } = require("../schemas/user");
+const { APP_PERMISSIONS } = require("../utils/constants");
 
 router.post("/login", async (req, res) => {
+  const {email, password, rememberMe} = req.body;
+
+  if (!email || !password || typeof rememberMe != 'boolean') {
+    return res.status(400).json({ success: false, message: "Missing: email | password | rememberMe", data: {} });
+  }
+
   try {
     // Validate user
     await loginSchema.validate(req.body, { abortEarly: true });
 
     // Find user
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email }).select('+password');
+
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid credentials", data: {} });
     }
@@ -25,10 +33,57 @@ router.post("/login", async (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: req.body.rememberMe ? "24d" : "24h" });
 
-    res.status(200).json({ success: true, message: "Logged in successfully!", data: token });
+    res.status(200).json(
+      { 
+        success: true, 
+        message: "Logged in successfully!", 
+        data: {
+          token,
+          user: {
+            id: user._id,
+            name: user.fullname,
+            email: user.email,
+            role: user.role,
+            appPermissions: user.appPermissions
+          }
+        } 
+      });
   } catch (error) {
     console.log('Error:', error)
     res.status(500).json({ success: false, message: "Server error", data: error });
+  }
+});
+
+router.post("/signup", async (req, res) => {
+  const userData = req.body;
+
+  if (!userData.email || !userData.password) {
+    return res.status(400).json({ success: false, message: "Missing email or password", data: {} });
+  }
+
+  // use all permissions for admin
+  if (userData.role === 'admin') {
+    userData.appPermissions = [...APP_PERMISSIONS];
+  }
+
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: userData.email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email is already registered", data: {} });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    userData.password = hashedPassword;
+
+    // Create new user
+    const newUser = new User(userData);
+    await newUser.save();
+
+    res.status(201).json({ success: true, message: "User created successfully", data: newUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", data: {} });
   }
 });
 

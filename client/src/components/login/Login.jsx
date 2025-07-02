@@ -5,6 +5,7 @@ import AuthAPI from '../../api/auth';
 import { useNavigate } from 'react-router-dom';
 // Import the background image
 import backgroundImage from '../../assets/images/LoginBG.png';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +36,9 @@ const Login = () => {
        *  3600 = 1 hour
        *  86400 = 1 day
       */
-      document.cookie = `token=${response.data.data}; path=/; max-age=3600`;
-      
+
+      const { token, user } = response.data.data;
+      login(user, token);
       resetFields();
       
       // Add a small delay to show success message before redirect
@@ -52,7 +55,6 @@ const Login = () => {
                           'Login failed. Please check your credentials and try again.';
       setError(errorMessage);
     } finally {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsLoading(false);
       resetFields();
     }

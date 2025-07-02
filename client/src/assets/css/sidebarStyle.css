@@ -1,0 +1,14 @@
+.nav-link:hover .tooltip-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure sidebar content stays within bounds */
+.sidebar-nav-link {
+  overflow: visible !important;
+}
+
+/* Fix any potential overflow issues */
+.sidebar-container {
+  overflow: visible !important;
+}

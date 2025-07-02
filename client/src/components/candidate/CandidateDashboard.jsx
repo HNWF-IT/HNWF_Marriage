@@ -84,17 +84,17 @@ const CandidateDashboard = () => {
     );
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Number of items per page
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [itemsPerPage] = useState(10); // Number of items per page
   const [loading, setLoading] = useState(false);
 
   // Calculate the index of the first and last item on the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPageCandidates = filteredCandidates?.slice(indexOfFirstItem, indexOfLastItem);
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentPageCandidates = filteredCandidates?.slice(indexOfFirstItem, indexOfLastItem);
 
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleClose = () => {
     setMode('');
@@ -129,17 +129,6 @@ const CandidateDashboard = () => {
     setCandidates(initialCandidatesNew);
   };
 
-  /*const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };*/
-
   const handleCandidateAddOrUpdate = (newCandidate, mode) => {
     if(mode === "add") {
       setCandidates((prev) => [...prev, newCandidate]); // Update the state
@@ -156,21 +145,21 @@ const CandidateDashboard = () => {
     {
       icon: <PeopleFill size={40} className="text-primary" />,
       label: "Total Candidates",
-      value: candidates.length,
+      value: filteredCandidates.length,
       bgColor: "bg-primary-subtle",
       textColor: "text-primary"
     },
     {
       icon: <HeartFill size={40} className="text-success" />,
       label: "Married",
-      value: candidates.filter(c => c.maritalStatus === "Married").length,
+      value: filteredCandidates.filter(c => c.maritalStatus === "Married").length,
       bgColor: "bg-success-subtle",
       textColor: "text-success"
     },
     {
       icon: <PersonCheckFill size={40} className="text-warning" />,
       label: "Single",
-      value: candidates.filter(c => c.maritalStatus === "Single").length,
+      value: filteredCandidates.filter(c => c.maritalStatus === "Single").length,
       bgColor: "bg-warning-subtle",
       textColor: "text-warning"
     }
@@ -182,7 +171,7 @@ const CandidateDashboard = () => {
       const next = batch + 1;
       setBatch(next);
       fetchCandidates(next);
-      setCurrentPage(1);
+      // setCurrentPage(1);
     }
   };
 
@@ -191,9 +180,13 @@ const CandidateDashboard = () => {
       const prev = batch - 1;
       setBatch(prev);
       fetchCandidates(prev);
-      setCurrentPage(1);
+      // setCurrentPage(1);
     }
   };
+
+  if(loading) {
+    return <PulseDotLoader />
+  }
 
   return (
     <>
@@ -395,156 +388,153 @@ const CandidateDashboard = () => {
               </Card.Body>
             </Card>
 
-            { loading ? 
-              (<PulseDotLoader />) : 
-              (<>
-                <div className="table-responsive">
-                  <Table hover className="align-middle">
-                    <thead className="bg-light">
-                      <tr key="head">
-                        <th style={{ cursor: 'pointer' }}>
-                          Sr#
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Gender
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Age 
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Marital Status
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Maslak
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Caste
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Qualification
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Health Condition
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Location
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Muslim Status
-                        </th>
-                        <th style={{ cursor: 'pointer' }}>
-                          Willing Status
-                        </th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentPageCandidates?.map((candidate, index) => ( 
-                        <tr key={candidate._id}>
-                          <td>{index + 1}</td>
-                          <td>
-                            <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
-                              {candidate.gender}
-                            </Badge>
-                          </td>
-                          <td>{calculateAge(candidate.dob)}</td>
-                          <td>{candidate.maritalStatus}</td>
-                          <td>{candidate.maslak}</td>
-                          <td>{candidate.caste}</td>
-                          <td>{candidate.qualification}</td>
-                          <td>{candidate.healthCondition}</td>
-                          <td>
-                            <i className="bi bi-geo-alt me-1"></i>
-                            {candidate.city}
-                          </td>
-                          <td>{candidate.muslimStatus}</td>
-                          <td>
-                            <Badge pill bg={candidate.willingStatus === 'Seeking' ? 'primary' : 'warning'}>
-                              {candidate.willingStatus}
-                            </Badge>
-                          </td>
-                          
-                          <td>
-                            <Button 
-                              variant="light"
-                              size="sm"
-                              className="me-1"
-                              onClick={() => handleShow('edit', candidate)}
-                            >
-                              <i className="bi bi-pencil"></i>
+            <>
+              <div className="table-responsive">
+                <Table hover className="align-middle">
+                  <thead className="bg-light">
+                    <tr key="head">
+                      <th style={{ cursor: 'pointer' }}>
+                        Sr#
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Gender
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Age 
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Marital Status
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Maslak
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Caste
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Qualification
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Health Condition
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Location
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Muslim Status
+                      </th>
+                      <th style={{ cursor: 'pointer' }}>
+                        Willing Status
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCandidates?.map((candidate, index) => ( 
+                      <tr key={candidate._id}>
+                        <td>{((batch - 1) * 50) + index + 1}</td>
+                        <td>
+                          <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
+                            {candidate.gender}
+                          </Badge>
+                        </td>
+                        <td>{calculateAge(candidate.dob)}</td>
+                        <td>{candidate.maritalStatus}</td>
+                        <td>{candidate.maslak}</td>
+                        <td>{candidate.caste}</td>
+                        <td>{candidate.qualification}</td>
+                        <td>{candidate.healthCondition}</td>
+                        <td>
+                          <i className="bi bi-geo-alt me-1"></i>
+                          {candidate.city}
+                        </td>
+                        <td>{candidate.muslimStatus}</td>
+                        <td>
+                          <Badge pill bg={candidate.willingStatus.toLowerCase() === 'seeking' ? 'primary' : 'warning'}>
+                            {candidate.willingStatus}
+                          </Badge>
+                        </td>
+                        
+                        <td>
+                          <Button 
+                            variant="light"
+                            size="sm"
+                            className="me-1"
+                            onClick={() => handleShow('edit', candidate)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+
+                          <Link to={`/candidates/${candidate._id}`}>
+                            <Button variant="light" size="sm">
+                              <i className="bi bi-three-dots-vertical"></i>
                             </Button>
-
-                            <Link to={`/candidates/${candidate._id}`}>
-                              <Button variant="light" size="sm">
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-
-                  {currentPageCandidates?.length === 0 && (
-                    <div className="text-center py-5">
-                      <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
-                      <p className="text-muted mb-0">No candidates found matching your search.</p>
-                    </div>
-                  )}
-                </div>
-
-                <Row className="d-flex justify-content-between">
-                <Col className="text-center">
-                  <Button
-                    style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
-                    onClick={handlePrevBatch}
-                    disabled={batch === 1}
-                  >
-                    Prev
-                  </Button>
-                </Col>
-
-                <Col className="text-center">
-                <Pagination className="justify-content-center custom-pagination">
-                    <Pagination.Prev
-                      onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-                      disabled={currentPage === 1}
-                    />
-                    {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
-                      <Pagination.Item
-                        key={number + 1}
-                        active={number + 1 === currentPage}
-                        onClick={() => {
-                          setCurrentPage(number + 1);
-                          paginate(number + 1);
-                        }}
-                      >
-                        {number + 1}
-                      </Pagination.Item>
+                          </Link>
+                        </td>
+                      </tr>
                     ))}
-                    <Pagination.Next
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
-                        )
-                      }
-                      disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
-                    />
-                  </Pagination>
-                </Col>
+                  </tbody>
+                </Table>
 
-                <Col className="text-center">
-                  <Button
-                    style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
-                    onClick={handleNextBatch}
-                    disabled={batch === totalBatches}
-                  >
-                    Next
-                  </Button>
-                </Col>
-                </Row>
-              </>
-            )}
+                {filteredCandidates?.length === 0 && (
+                  <div className="text-center py-5">
+                    <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
+                    <p className="text-muted mb-0">No candidates found matching your search.</p>
+                  </div>
+                )}
+              </div>
+
+              <Row className="d-flex justify-content-between">
+              <Col className="text-center">
+                <Button
+                  style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
+                  onClick={handlePrevBatch}
+                  disabled={batch === 1}
+                >
+                  Prev
+                </Button>
+              </Col>
+
+              {/* <Col className="text-center">
+              <Pagination className="justify-content-center custom-pagination">
+                  <Pagination.Prev
+                    onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
+                    disabled={currentPage === 1}
+                  />
+                  {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
+                    <Pagination.Item
+                      key={number + 1}
+                      active={number + 1 === currentPage}
+                      onClick={() => {
+                        setCurrentPage(number + 1);
+                        paginate(number + 1);
+                      }}
+                    >
+                      {number + 1}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
+                      )
+                    }
+                    disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
+                  />
+                </Pagination>
+              </Col> */}
+
+              <Col className="text-center">
+                <Button
+                  style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
+                  onClick={handleNextBatch}
+                  disabled={batch === totalBatches}
+                >
+                  Next
+                </Button>
+              </Col>
+              </Row>
+            </>
 
           </Card.Body>
         </Card>
