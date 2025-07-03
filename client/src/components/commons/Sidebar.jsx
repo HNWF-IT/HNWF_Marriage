@@ -21,48 +21,55 @@ const Sidebar = ({
 }) => {
   const navigate = useNavigate();
 
-  // Example navLinks with icon & permission
+  // Navigation items with role-based access control
+  // roles: [] means no role restriction - visible to all users
+  // roles: ['admin'] means only admin can see
+  // roles: ['admin', 'moderator'] means admin and moderator can see
   const rawNavLinks = [
     {
       name: "Dashboard",
       short: "D",
       path: "/dashboard",
       icon: <HouseDoor size={18} />,
-      permission: null,
+      roles: ["admin"], // Only admin can see Dashboard
     },
     {
       name: "Users",
       short: "U",
       path: "/users",
       icon: <People size={18} />,
-      permission: null,
+      roles: ["admin"], // Only admin can see Users
     },
     {
       name: "Marriage",
       short: "M",
       path: "/marriage",
       icon: <Heart size={18} />,
-      permission: "marriage",
+      roles: ["admin", "moderator", "user"], // Admin, moderator, and user can see
     },
     {
       name: "Library",
       short: "L",
       path: "/library",
       icon: <Book size={18} />,
-      permission: "library",
+      roles: ["admin", "moderator", "user"], // Admin, moderator, and user can see
     },
   ];
 
   // Get logged in user from localStorage
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userPermissions = user.appPermissions || [];
+  const userRole = user.role || "guest"; // Default to 'guest' if no role
 
-  // Memoized navLinks based on permissions
+  // Memoized navLinks based on user role
   const navLinks = useMemo(() => {
-    return rawNavLinks.filter(
-      (link) => !link.permission || userPermissions.includes(link.permission)
-    );
-  }, [userPermissions]);
+    return rawNavLinks.filter(link => {
+      // If no roles specified, show to everyone
+      if (!link.roles || link.roles.length === 0) return true;
+      
+      // Check if user's role is in the allowed roles
+      return link.roles.includes(userRole);
+    });
+  }, [userRole]);
 
   const sidebarStyles = {
     sidebar: {
@@ -289,6 +296,29 @@ const Sidebar = ({
               );
             })}
           </Nav>
+        )}
+
+        {/* Role Badge - Show current user role when sidebar is open */}
+        {sidebarOpen && (
+          <div className="px-4 py-2">
+            <div 
+              className="d-flex align-items-center justify-content-center py-2 px-3 rounded-pill"
+              style={{
+                backgroundColor: `${colors.white}20`,
+                backdropFilter: "blur(10px)",
+                border: `1px solid ${colors.white}30`
+              }}
+            >
+              <small style={{ 
+                color: colors.white,
+                fontSize: "0.75rem",
+                fontWeight: "600",
+                textTransform: "capitalize"
+              }}>
+                {userRole} Access
+              </small>
+            </div>
+          </div>
         )}
 
         {/* Bottom Section - Only show if sidebar is open */}

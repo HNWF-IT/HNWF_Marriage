@@ -125,6 +125,56 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
+// PATCH: Deactivate or Activate user by ID
+router.patch('/status/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { status } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing user ID',
+        data: {},
+      });
+    }
+
+    if (typeof status !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be true or false.',
+        data: {},
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: {},
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `User ${status ? 'activated' : 'deactivated'} successfully`,
+      data: updatedUser,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: 'Error updating user status',
+      data: err,
+    });
+  }
+});
+
 // DELETE: Delete user by ID
 router.delete('/delete/:id', async (req, res) => {
   try {
