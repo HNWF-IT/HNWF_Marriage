@@ -13,12 +13,13 @@ import {
   PersonFill,
   PersonSlash,
   PersonX,
+  PersonCheck,
   Telephone,
   ThreeDotsVertical,
   Trash,
 } from 'react-bootstrap-icons';
 
-const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal }) => {
+const UserTable = ({ users, onUserModalShow, onStatusToggle, setSelectedUser, setShowDeleteModal }) => {
   const getStatusBadge = (status) => {
     return status ? <Badge bg="success">Active</Badge> : <Badge bg="secondary">Inactive</Badge>;
   };
@@ -82,30 +83,34 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                   <td className="py-3">{getStatusBadge(user.status)}</td>
                   <td className="py-3">
                     <div style={{ width: 'fit-content' }}>
-                      {/* First Row - Deactivate and Reset Password */}
+                      {/* First Row - Activate/Deactivate and Reset Password */}
                       <div className="d-flex gap-1 mb-1">
-                        {/* Deactivate Account Button */}
+                        {/* Dynamic Activate/Deactivate */}
                         <OverlayTrigger
                           placement="top"
-                          overlay={<Tooltip>Deactivate Account</Tooltip>}
+                          overlay={
+                            <Tooltip>
+                              {user.status ? 'Deactivate Account' : 'Activate Account'}
+                            </Tooltip>
+                          }
                         >
                           <Button
                             size="sm"
-                            variant="outline-warning"
+                            variant={user.status ? 'outline-danger' : 'outline-success'}
                             className="p-1 d-flex align-items-center justify-content-center"
-                            style={{ 
-                              width: '28px', 
+                            style={{
+                              width: '28px',
                               height: '28px',
-                              border: '1px solid #ffc107',
-                              borderRadius: '6px'
+                              border: user.status ? '1px solid #dc3545' : '1px solid #198754',
+                              borderRadius: '6px',
                             }}
-                            onClick={() => handleDeactivateUser(user)}
+                            onClick={() => onStatusToggle(user)}
                           >
-                            <PersonSlash size={12} />
+                            {user.status ? <PersonX size={12} /> : <PersonCheck size={12} />}
                           </Button>
                         </OverlayTrigger>
 
-                        {/* Reset Password Button */}
+                        {/* Reset Password */}
                         <OverlayTrigger
                           placement="top"
                           overlay={<Tooltip>Reset Password</Tooltip>}
@@ -114,22 +119,21 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                             size="sm"
                             variant="outline-info"
                             className="p-1 d-flex align-items-center justify-content-center"
-                            style={{ 
-                              width: '28px', 
+                            style={{
+                              width: '28px',
                               height: '28px',
                               border: '1px solid #0dcaf0',
-                              borderRadius: '6px'
+                              borderRadius: '6px',
                             }}
-                            onClick={() => handleResetPassword(user)}
+                            onClick={() => console.log('Handle reset password')}
                           >
                             <KeyFill size={12} />
                           </Button>
                         </OverlayTrigger>
                       </div>
 
-                      {/* Second Row - More Options and Edit User */}
+                      {/* Second Row - Edit User and More */}
                       <div className="d-flex gap-1">
-                        {/* Edit User Button */}
                         <OverlayTrigger
                           placement="top"
                           overlay={<Tooltip>Edit User</Tooltip>}
@@ -138,11 +142,11 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                             size="sm"
                             variant="outline-success"
                             className="p-1 d-flex align-items-center justify-content-center"
-                            style={{ 
-                              width: '28px', 
+                            style={{
+                              width: '28px',
                               height: '28px',
                               border: '1px solid #198754',
-                              borderRadius: '6px'
+                              borderRadius: '6px',
                             }}
                             onClick={() => onUserModalShow('edit', user)}
                           >
@@ -150,7 +154,6 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                           </Button>
                         </OverlayTrigger>
 
-                        {/* More Options Button */}
                         <OverlayTrigger
                           placement="top"
                           overlay={<Tooltip>More Options</Tooltip>}
@@ -161,20 +164,20 @@ const UserTable = ({ users, onUserModalShow, setSelectedUser, setShowDeleteModal
                               size="sm"
                               variant="outline-secondary"
                               className="p-1 d-flex align-items-center justify-content-center border-0"
-                              style={{ 
-                                width: '28px', 
+                              style={{
+                                width: '28px',
                                 height: '28px',
                                 border: '1px solid #6c757d',
-                                borderRadius: '6px'
+                                borderRadius: '6px',
                               }}
                             >
                               <ThreeDotsVertical size={12} />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => handleViewProfile(user)}>
+                              <Dropdown.Item onClick={() => console.log('View Profile')}>
                                 <EyeFill className="me-2" size={14} /> View Profile
                               </Dropdown.Item>
-                              <Dropdown.Item onClick={() => handleSendMessage(user)}>
+                              <Dropdown.Item onClick={() => console.log('Send Message')}>
                                 <ChatFill className="me-2" size={14} /> Send Message
                               </Dropdown.Item>
                               <Dropdown.Divider />

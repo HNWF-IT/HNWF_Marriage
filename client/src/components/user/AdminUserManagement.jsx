@@ -7,6 +7,7 @@ import UserTable from './UserTable';
 import UserModal from './UserModal';
 import UserAPI from '../../api/user';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import PulseDotLoader from '../commons/spinner/PulseDotLoader';
 
 const AdminUserManagement = () => {
@@ -85,6 +86,36 @@ const AdminUserManagement = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleStatusToggle = async (user) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `You want to ${user.status ? "deactivate" : "activate"} the account.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Confirm"
+      });
+
+      if (result.isConfirmed) {
+        const newStatus = !user.status; // toggle it
+        const response = await UserAPI.updateUserStatus(user._id, newStatus);
+
+        setUsers(prev =>
+          prev.map(u => u._id === user._id ? { ...u, status: newStatus } : u)
+        );
+
+        // showNotification(response.data.message);
+        toast.success(`User has been ${newStatus ? "activated" : "deactivated"}.`);
+      }
+
+    } catch (err) {
+      const message = err?.response?.data?.message || "Failed to update user status";
+      toast.error(message);
+    }
+  };
+
   if(loading) {
     return <PulseDotLoader />
   }
@@ -152,7 +183,12 @@ const AdminUserManagement = () => {
         </Card.Body>
       </Card>
 
-      <UserTable users={filteredUsers} onUserModalShow={handleUserModalShow} />
+      <UserTable
+        users={filteredUsers}
+        onUserModalShow={handleUserModalShow}
+        onStatusToggle={handleStatusToggle}
+      />
+
       <UserModal
         mode={modalMode}
         userData={selectedUser}
