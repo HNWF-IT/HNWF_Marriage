@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { PencilSquare, PersonPlus } from 'react-bootstrap-icons';
+import { PencilSquare, PersonPlus, Shield, Star } from 'react-bootstrap-icons';
 import UserAPI from '../../api/user';
 import AuthAPI from '../../api/auth';
 import { APP_PERMISSIONS } from '../../utils/constants';
@@ -33,6 +33,9 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
     },
   });
 
+  // Watch the role field to conditionally show app permissions
+  const selectedRole = watch('role');
+
   useEffect(() => {
     if (userData) {
       Object.entries(userData).forEach(([key, value]) => {
@@ -49,6 +52,11 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
   };
 
   const onSubmit = (newUser) => {
+    // If role is admin, clear app permissions
+    if (newUser.role === 'admin') {
+      newUser.appPermissions = [];
+    }
+
     const action = isCreateMode ? AuthAPI.signup : () => UserAPI.updateUser(userData._id, newUser);
     action(newUser)
       .then((response) => {
@@ -83,74 +91,100 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Modal.Body className="bg-light" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           <div className="bg-white p-4 rounded shadow-sm">
-            <h5 className="mb-4" style={{ color: 'grey' }}>Basic Information</h5>
+            <h5 className="mb-4" style={{ color: 'grey' }}>
+              {isCreateMode ? 'Basic Information' : 'Update Information'}
+            </h5>
             <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Full Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter full name"
-                    isInvalid={!!errors.fullname}
-                    {...register('fullname', {
-                      required: 'Full name is required',
-                      minLength: { value: 2, message: 'Full name must be at least 2 characters' },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.fullname?.message}</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
+              {/* Show all fields in create mode, only role and app permissions in edit mode */}
+              {isCreateMode && (
+                <>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Full Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter full name"
+                        isInvalid={!!errors.fullname}
+                        {...register('fullname', {
+                          required: 'Full name is required',
+                          minLength: { value: 2, message: 'Full name must be at least 2 characters' },
+                        })}
+                      />
+                      <Form.Control.Feedback type="invalid">{errors.fullname?.message}</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    isInvalid={!!errors.email}
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: 'Invalid email format',
-                      },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control
+                        type="email"
+                        placeholder="Enter email"
+                        isInvalid={!!errors.email}
+                        {...register('email', {
+                          required: 'Email is required',
+                          pattern: {
+                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                            message: 'Invalid email format',
+                          },
+                        })}
+                      />
+                      <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter password"
-                    isInvalid={!!errors.password}
-                    {...register('password', {
-                      required: 'Password is required',
-                      minLength: { value: 6, message: 'Password must be at least 6 characters' },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        placeholder="Enter password"
+                        isInvalid={!!errors.password}
+                        {...register('password', {
+                          required: 'Password is required',
+                          minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                        })}
+                      />
+                      <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Confirm password"
-                    isInvalid={!!errors.confirmPassword}
-                    {...register('confirmPassword', {
-                      required: 'Please confirm your password',
-                      validate: (value) => value === watch('password') || 'Passwords do not match',
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.confirmPassword?.message}</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Confirm Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        placeholder="Confirm password"
+                        isInvalid={!!errors.confirmPassword}
+                        {...register('confirmPassword', {
+                          required: 'Please confirm your password',
+                          validate: (value) => value === watch('password') || 'Passwords do not match',
+                        })}
+                      />
+                      <Form.Control.Feedback type="invalid">{errors.confirmPassword?.message}</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Phone Number</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        placeholder="Enter phone number"
+                        isInvalid={!!errors.phoneNo}
+                        {...register('phoneNo', {
+                          required: 'Phone number is required',
+                          pattern: {
+                            value: /^[0-9]{10,15}$/,
+                            message: 'Phone number must be 10-15 digits',
+                          },
+                        })}
+                      />
+                      <Form.Control.Feedback type="invalid">{errors.phoneNo?.message}</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </>
+              )}
 
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -164,44 +198,32 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
                 </Form.Group>
               </Col>
 
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    placeholder="Enter phone number"
-                    isInvalid={!!errors.phoneNo}
-                    {...register('phoneNo', {
-                      required: 'Phone number is required',
-                      pattern: {
-                        value: /^[0-9]{10,15}$/,
-                        message: 'Phone number must be 10-15 digits',
-                      },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.phoneNo?.message}</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-
-              <Col md={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>App Permissions</Form.Label>
-                  <div>
-                    {APP_PERMISSIONS.map((app) => (
-                      <Form.Check
-                        key={app}
-                        type="checkbox"
-                        label={app.charAt(0).toUpperCase() + app.slice(1)}
-                        value={app}
-                        {...register('appPermissions', {
-                          validate: (value) => value?.length > 0 || 'At least one app permission must be selected',
-                        })}
-                      />
-                    ))}
-                  </div>
-                  {errors.appPermissions && <Form.Text className="text-danger">{errors.appPermissions.message}</Form.Text>}
-                </Form.Group>
-              </Col>
+              {/* Show app permissions only if role is not admin */}
+              {selectedRole !== 'admin' && (
+                <Col md={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>App Permissions</Form.Label>
+                    <div className={`form-control ${errors.appPermissions ? 'is-invalid' : ''}`} style={{ height: 'auto', padding: '15px' }}>
+                      <Row>
+                        {APP_PERMISSIONS.map((app, index) => (
+                          <Col md={6} lg={4} key={app} className="mb-2">
+                            <Form.Check
+                              type="checkbox"
+                              id={`permission-${index}`}
+                              label={app.charAt(0).toUpperCase() + app.slice(1)}
+                              value={app}
+                              {...register('appPermissions', {
+                                validate: (value) => value?.length > 0 || 'At least one app permission must be selected',
+                              })}
+                            />
+                          </Col>
+                        ))}
+                      </Row>
+                    </div>
+                    <Form.Control.Feedback type="invalid">{errors.appPermissions?.message}</Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              )}
             </Row>
           </div>
         </Modal.Body>

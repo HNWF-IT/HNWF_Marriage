@@ -125,4 +125,48 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+router.patch("/:id/willing-status", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { willingStatus } = req.body;
+
+    const allowedStatuses = ["Seeking", "On Hold", "Done"];
+    if (!allowedStatuses.includes(willingStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid willing status",
+        data: null
+      });
+    }
+
+    const updatedCandidate = await Candidate.findByIdAndUpdate(
+      id,
+      { willingStatus },
+      { new: true }
+    );
+
+    if (!updatedCandidate) {
+      return res.status(404).json({
+        success: false,
+        message: "Candidate not found",
+        data: null
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Willingness status updated successfully",
+      data: updatedCandidate
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Error updating willingness status",
+      data: err
+    });
+  }
+});
+
 module.exports = router;

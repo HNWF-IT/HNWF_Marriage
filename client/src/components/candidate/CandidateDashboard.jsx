@@ -48,8 +48,6 @@ const CandidateDashboard = () => {
       }
 
       const response = await CandidateAPI.getCandidatesBatch(batchNo, filters);
-      // const temp = await CandidateAPI.getAllCandidates();
-
       if(response.data.success && response.data.data) {
         const { candidates, totalCount } = response.data.data;
 
@@ -84,17 +82,7 @@ const CandidateDashboard = () => {
     );
   });
 
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [itemsPerPage] = useState(10); // Number of items per page
   const [loading, setLoading] = useState(false);
-
-  // Calculate the index of the first and last item on the current page
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentPageCandidates = filteredCandidates?.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Change page
-  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleClose = () => {
     setMode('');
@@ -171,7 +159,6 @@ const CandidateDashboard = () => {
       const next = batch + 1;
       setBatch(next);
       fetchCandidates(next);
-      // setCurrentPage(1);
     }
   };
 
@@ -180,7 +167,28 @@ const CandidateDashboard = () => {
       const prev = batch - 1;
       setBatch(prev);
       fetchCandidates(prev);
-      // setCurrentPage(1);
+    }
+  };
+
+  const handleWillingnessChange = async (candidateId, newStatus) => {
+    try {
+      const response = await CandidateAPI.updateWillingnessStatus(candidateId, newStatus);
+
+      if (response.data.success) {
+        toast.success("Willingness status updated");
+
+        setCandidates((prev) =>
+          prev.map((c) =>
+            c._id === candidateId ? { ...c, willingStatus: newStatus } : c
+          )
+        );
+      } else {
+        toast.error(response.data.message || "Failed to update willingness status");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating willingness status");
     }
   };
 
@@ -465,6 +473,15 @@ const CandidateDashboard = () => {
                             <i className="bi bi-pencil"></i>
                           </Button>
 
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="me-1"
+                            onClick={() => handleWillingnessChange(candidate._id, "Done")}
+                          >
+                            <i className="bi bi-check2-circle"></i>
+                          </Button>
+
                           <Link to={`/candidates/${candidate._id}`}>
                             <Button variant="light" size="sm">
                               <i className="bi bi-three-dots-vertical"></i>
@@ -494,35 +511,6 @@ const CandidateDashboard = () => {
                   Prev
                 </Button>
               </Col>
-
-              {/* <Col className="text-center">
-              <Pagination className="justify-content-center custom-pagination">
-                  <Pagination.Prev
-                    onClick={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-                    disabled={currentPage === 1}
-                  />
-                  {[...Array(Math.ceil(filteredCandidates?.length / itemsPerPage)).keys()].map((number) => (
-                    <Pagination.Item
-                      key={number + 1}
-                      active={number + 1 === currentPage}
-                      onClick={() => {
-                        setCurrentPage(number + 1);
-                        paginate(number + 1);
-                      }}
-                    >
-                      {number + 1}
-                    </Pagination.Item>
-                  ))}
-                  <Pagination.Next
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        prev < Math.ceil(filteredCandidates?.length / itemsPerPage) ? prev + 1 : prev
-                      )
-                    }
-                    disabled={currentPage === Math.ceil(filteredCandidates?.length / itemsPerPage)}
-                  />
-                </Pagination>
-              </Col> */}
 
               <Col className="text-center">
                 <Button
