@@ -140,12 +140,13 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, setSelectedUser, se
                         >
                           <Button
                             size="sm"
-                            variant="outline-success"
+                            variant="outline-warning"
                             className="p-1 d-flex align-items-center justify-content-center"
                             style={{
                               width: '28px',
                               height: '28px',
-                              border: '1px solid #198754',
+                              border: '1px solid',
+                              borderColor: 'warning',
                               borderRadius: '6px',
                             }}
                             onClick={() => onUserModalShow('edit', user)}
