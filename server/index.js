@@ -15,7 +15,6 @@ const authRoutes = require("./routes/auth");
 
 const express = require("express");
 const app = express();
-app.use(express.json());
 
 // Middleware for handling JSON.
 app.use(cors({
@@ -23,6 +22,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 app.options('*', cors()); 
+
+// After CORS, Handle express json!
+app.use(express.json());
 
 // Protected routes for candidates
 app.use("/api/candidate", validateRequest, candidateRoutes);
