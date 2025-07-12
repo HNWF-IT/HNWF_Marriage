@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Badge } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
@@ -14,11 +14,19 @@ import {
   HeartFill, 
   PersonCheckFill, 
   Search,
-  Filter
+  Filter,
+  PersonPlusFill,
+  GeoAltFill,
+  PencilSquare,
+  CheckCircleFill,
+  ThreeDotsVertical,
+  ChevronLeft,
+  ChevronRight
 } from 'react-bootstrap-icons';
 import StatsCardRow from '../commons/stats/StatsCardRow';
 
 const CANDIDATES_PER_BATCH = 50;
+
 const CandidateDashboard = () => {
   const [candidates, setCandidates] = useState([]);
   const [filters, setFilters] = useState({
@@ -38,6 +46,7 @@ const CandidateDashboard = () => {
   const [batch, setBatch] = useState(1);
   const [totalBatches, setTotalBatches] = useState(null);
   const [willingStatus, setWillingStatus] = useState('Seeking');
+  const [loading, setLoading] = useState(false);
 
   const fetchCandidates = async (batchNo) => {
     setLoading(true);
@@ -82,8 +91,6 @@ const CandidateDashboard = () => {
     );
   });
 
-  const [loading, setLoading] = useState(false);
-
   const handleClose = () => {
     setMode('');
     setSelectedCandidate({});
@@ -105,21 +112,19 @@ const CandidateDashboard = () => {
 
   const resetFilters = () => {
     setFilters({
-      name: '',
+      gender: '',
       minAge: '',
       maxAge: '',
-      gender: '',
       maritalStatus: '',
       qualification: '',
-      city: '',
       muslimStatus: '',
+      city: ''
     });
-    setCandidates(initialCandidatesNew);
   };
 
   const handleCandidateAddOrUpdate = (newCandidate, mode) => {
     if(mode === "add") {
-      setCandidates((prev) => [...prev, newCandidate]); // Update the state
+      setCandidates((prev) => [...prev, newCandidate]);
     } else if(mode === "edit") {
       setCandidates(prevCandidates =>
         prevCandidates.map(candidate =>
@@ -153,8 +158,7 @@ const CandidateDashboard = () => {
     }
   ];
 
-
- const handleNextBatch = () => {
+  const handleNextBatch = () => {
     if (totalBatches && batch < totalBatches) {
       const next = batch + 1;
       setBatch(next);
@@ -207,323 +211,406 @@ const CandidateDashboard = () => {
       /> : ""}
 
       <Container fluid className="p-4 bg-light min-vh-100">
-        <Card className="border-0 shadow-sm">
-          <Card.Body>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="mb-0" style={{color: "#A49559"}}>Candidate Dashboard</h2>
-              <div className="d-flex flex-row justify-content-center align-items-center p-2 gap-3">
-                <Button 
-                  variant="outline-success" 
-                  onClick={() => handleShow('add', {})}
-                  className="d-flex align-items-center me-2"
-                  size='sm'
-                >
-                  <i className="bi bi-plus"></i>
-                  Add
-                </Button>
+        {/* Header */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="mb-0 fw-bold" style={{color: "#A49559"}}>
+            Candidate Dashboard
+          </h2>
+          <div className="d-flex gap-2">
+            <Button 
+              variant="success" 
+              onClick={() => handleShow('add', {})}
+              className="d-flex align-items-center"
+              size="sm"
+            >
+              <PersonPlusFill className="me-1" size={16} />
+              Add
+            </Button>
 
-                <Button 
-                  variant="outline-primary" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="d-flex align-items-center"
-                  size='sm'
-                >
-                  <i className="bi bi-sliders2"></i>
-                  Filters
-                </Button>
-              </div>
-            </div>
+            <Button 
+              variant="outline-primary" 
+              onClick={() => setShowFilters(!showFilters)}
+              className="d-flex align-items-center"
+              size="sm"
+            >
+              <Filter className="me-1" size={16} />
+              Filters
+            </Button>
+          </div>
+        </div>
 
-            {/* Advanced Filters */}
-            <Collapse in={showFilters}>
-              <div>
-                <Row className="mb-4 g-3">
-                  <Col md={2} className='d-flex'>
-                      <Form.Group style={{width: '50%'}}>
-                          <Form.Label>Min Age</Form.Label>
-                          <Form.Control
-                          type="number"
-                          name="minAge"
-                          value={filters.minAge}
-                          onChange={(e) => handleFilterChange('minAge', e.target.value)}
-                          placeholder="Min"
-                          min="12"
-                          />
-                      </Form.Group>
-
-                      <Form.Group style={{width: '50%', marginLeft: '10px'}}>
-                          <Form.Label>Max Age</Form.Label>
-                          <Form.Control
-                          type="number"
-                          name="maxAge"
-                          value={filters.maxAge}
-                          onChange={(e) => handleFilterChange('maxAge', e.target.value)}
-                          placeholder="Max"
-                          min="12"
-                          />
-                      </Form.Group>
-                    </Col>
-                    
-                    <Col md={2}>
-                      <Form.Group>
-                        <Form.Label>Gender</Form.Label>
-                          <Form.Select name="gender" 
-                            value={filters.gender}
-                            onChange={(e) => handleFilterChange('gender', e.target.value)}
-                            >
-                            <option value="">All</option>
-                            {Object.values(Gender).map((gender) => (
-                              <option key={gender} value={gender}>
-                                {gender}
-                              </option>
-                            ))}
-                          </Form.Select>
-                      </Form.Group>
-                    </Col>
-                    
-                    <Col md={2}>
-                      <Form.Group>
-                          <Form.Label>Marital Status</Form.Label>
-                          <Form.Select name="maritalStatus"
-                              value={filters.maritalStatus}
-                              onChange={(e) => handleFilterChange('maritalStatus', e.target.value)}
-                          >
-                          <option value="">All</option>
-                          {Object.values(MaritalStatus).map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                          </Form.Select>
-                      </Form.Group>
-                    </Col>
-                    
-                    <Col md={2}>
-                      <Form.Group>
-                          <Form.Label>Qualification</Form.Label>
-                          <Form.Select name="qualification"
-                              value={filters.qualification}
-                              onChange={(e) => handleFilterChange('qualification', e.target.value)}
-                          >
-                          <option value="">All</option>
-                          {Object.values(Education).map((edu) => (
-                            <option key={edu} value={edu}>
-                              {edu}
-                            </option>
-                          ))}
-                          </Form.Select>
-                      </Form.Group>
-                    </Col>
-                    
-                    <Col md={2}>
-                      <Form.Group>
-                          <Form.Label>Muslim Status</Form.Label>
-                          <Form.Select name="muslimStatus"
-                              value={filters.muslimStatus}
-                              onChange={(e) => handleFilterChange('muslimStatus', e.target.value)}
-                          >
-                          <option value="">All</option>
-                          {Object.values(MuslimStatus).map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                          </Form.Select>
-                      </Form.Group>
-                    </Col>
-
-                    <Col md={2}>
-                      <Form.Group>
-                        <Form.Label>City</Form.Label>
-                        <Form.Control
-                          placeholder="City"
-                          value={filters.city}
-                          onChange={(e) => handleFilterChange('city', e.target.value)}
-                          className="border-start-0"
-                        />
-                      </Form.Group>
-                    </Col>
-                    
-                    <Col xs={12} className="text-end">
-                      <Button className="me-2"
-                          onClick={resetFilters}
-                          style={{backgroundColor: "#A49559"}}
-                      >
-                          Reset
-                      </Button>
-                  </Col>
-                </Row>
-              </div>
-            </Collapse>
-            
-            {/* Stats cards */}
-            <StatsCardRow stats={candidatesStats} />
-            
-            {/* Filters and Search */}
-            <Card className="shadow-sm mb-4">
-              <Card.Body>
-                <Row className="align-items-center">
-                  <Col md={9} className="mb-3 mb-md-0">
-                    <InputGroup>
-                      <InputGroup.Text>
-                        <Search />
-                      </InputGroup.Text>
-                      <Form.Control
-                        type="text"
-                        placeholder="Search candidates by name..."
-                        value={filters.name}
-                        onChange={(e) => handleFilterChange('name', e.target.value)}
-                      />
-                    </InputGroup>
-                  </Col>
-                  <Col md={3} className="mb-3 mb-md-0">
-                    <InputGroup>
-                      <InputGroup.Text>
-                        <Filter />
-                      </InputGroup.Text>
-                      <Form.Select
-                        value={willingStatus}
-                        onChange={(e) => { setWillingStatus(e.target.value); setBatch(1); setCurrentPage(1); }}
-                      >
-                        <option value="">All</option>
-                        <option value="Seeking">Seeking</option>
-                        <option value="Done">Done</option>
-                        <option value="On Hold">On Hold</option>
-                      </Form.Select>
-                    </InputGroup>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-
-            <>
-              <div className="table-responsive">
-                <Table hover className="align-middle">
-                  <thead className="bg-light">
-                    <tr key="head">
-                      <th style={{ cursor: 'pointer' }}>
-                        Sr#
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Gender
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Age 
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Marital Status
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Maslak
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Caste
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Qualification
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Health Condition
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Location
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Muslim Status
-                      </th>
-                      <th style={{ cursor: 'pointer' }}>
-                        Willing Status
-                      </th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCandidates?.map((candidate, index) => ( 
-                      <tr key={candidate._id}>
-                        <td>{((batch - 1) * 50) + index + 1}</td>
-                        <td>
-                          <Badge pill bg={candidate.gender === 'Male' ? 'primary' : 'danger'}>
-                            {candidate.gender}
-                          </Badge>
-                        </td>
-                        <td>{calculateAge(candidate.dob)}</td>
-                        <td>{candidate.maritalStatus}</td>
-                        <td>{candidate.maslak}</td>
-                        <td>{candidate.caste}</td>
-                        <td>{candidate.qualification}</td>
-                        <td>{candidate.healthCondition}</td>
-                        <td>
-                          <i className="bi bi-geo-alt me-1"></i>
-                          {candidate.city}
-                        </td>
-                        <td>{candidate.muslimStatus}</td>
-                        <td>
-                          <Badge pill bg={candidate.willingStatus.toLowerCase() === 'seeking' ? 'primary' : 'warning'}>
-                            {candidate.willingStatus}
-                          </Badge>
-                        </td>
-                        
-                        <td>
-                          <Button 
-                            variant="light"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleShow('edit', candidate)}
-                          >
-                            <i className="bi bi-pencil"></i>
-                          </Button>
-
-                          <Button
-                            variant="light"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleWillingnessChange(candidate._id, "Done")}
-                          >
-                            <i className="bi bi-check2-circle"></i>
-                          </Button>
-
-                          <Link to={`/candidates/${candidate._id}`}>
-                            <Button variant="light" size="sm">
-                              <i className="bi bi-three-dots-vertical"></i>
-                            </Button>
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-
-                {filteredCandidates?.length === 0 && (
-                  <div className="text-center py-5">
-                    <i className="bi bi-search display-1 text-muted mb-3 d-block"></i>
-                    <p className="text-muted mb-0">No candidates found matching your search.</p>
+        {/* Advanced Filters */}
+        <Collapse in={showFilters}>
+          <Card className="shadow-sm mb-4">
+            <Card.Body>
+              <h6 className="mb-3">Filter Options</h6>
+              <Row className="g-3">
+                <Col md={2}>
+                  <Form.Label>Age Range</Form.Label>
+                  <div className="d-flex gap-1">
+                    <Form.Control
+                      type="number"
+                      placeholder="Min"
+                      value={filters.minAge}
+                      onChange={(e) => handleFilterChange('minAge', e.target.value)}
+                      min="12"
+                      size="sm"
+                    />
+                    <Form.Control
+                      type="number"
+                      placeholder="Max"
+                      value={filters.maxAge}
+                      onChange={(e) => handleFilterChange('maxAge', e.target.value)}
+                      min="12"
+                      size="sm"
+                    />
                   </div>
-                )}
-              </div>
+                </Col>
+                
+                <Col md={2}>
+                  <Form.Label>Gender</Form.Label>
+                  <Form.Select 
+                    value={filters.gender}
+                    onChange={(e) => handleFilterChange('gender', e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All</option>
+                    {Object.values(Gender).map((gender) => (
+                      <option key={gender} value={gender}>
+                        {gender}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                
+                <Col md={2}>
+                  <Form.Label>Marital Status</Form.Label>
+                  <Form.Select 
+                    value={filters.maritalStatus}
+                    onChange={(e) => handleFilterChange('maritalStatus', e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All</option>
+                    {Object.values(MaritalStatus).map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                
+                <Col md={2}>
+                  <Form.Label>Qualification</Form.Label>
+                  <Form.Select 
+                    value={filters.qualification}
+                    onChange={(e) => handleFilterChange('qualification', e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All</option>
+                    {Object.values(Education).map((edu) => (
+                      <option key={edu} value={edu}>
+                        {edu}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                
+                <Col md={2}>
+                  <Form.Label>Muslim Status</Form.Label>
+                  <Form.Select 
+                    value={filters.muslimStatus}
+                    onChange={(e) => handleFilterChange('muslimStatus', e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All</option>
+                    {Object.values(MuslimStatus).map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Col>
 
-              <Row className="d-flex justify-content-between">
-              <Col className="text-center">
-                <Button
-                  style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
-                  onClick={handlePrevBatch}
-                  disabled={batch === 1}
-                >
-                  Prev
-                </Button>
-              </Col>
-
-              <Col className="text-center">
-                <Button
-                  style={{backgroundColor: "#4C6C44", border: "#4C6C44"}}
-                  onClick={handleNextBatch}
-                  disabled={batch === totalBatches}
-                >
-                  Next
-                </Button>
-              </Col>
+                <Col md={2}>
+                  <Form.Label>City</Form.Label>
+                  <Form.Control
+                    placeholder="City"
+                    value={filters.city}
+                    onChange={(e) => handleFilterChange('city', e.target.value)}
+                    size="sm"
+                  />
+                </Col>
+                
+                <Col xs={12}>
+                  <Button 
+                    variant="outline-secondary"
+                    onClick={resetFilters}
+                    size="sm"
+                  >
+                    Reset Filters
+                  </Button>
+                </Col>
               </Row>
-            </>
+            </Card.Body>
+          </Card>
+        </Collapse>
+        
+        {/* Stats cards */}
+        <StatsCardRow stats={candidatesStats} />
+        
+        {/* Search and Filter Controls */}
+        <Card className="shadow-sm mb-4">
+          <Card.Body>
+            <Row className="align-items-center">
+              <Col md={8} className="mb-3 mb-md-0">
+                <InputGroup>
+                  <InputGroup.Text>
+                    <Search size={16} />
+                  </InputGroup.Text>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search candidates..."
+                    value={filters.name}
+                    onChange={(e) => handleFilterChange('name', e.target.value)}
+                  />
+                </InputGroup>
+              </Col>
+              <Col md={4}>
+                <InputGroup>
+                  <InputGroup.Text>
+                    <Filter size={16} />
+                  </InputGroup.Text>
+                  <Form.Select
+                    value={willingStatus}
+                    onChange={(e) => { setWillingStatus(e.target.value); setBatch(1); }}
+                  >
+                    <option value="">All Status</option>
+                    <option value="Seeking">Seeking</option>
+                    <option value="Done">Done</option>
+                    <option value="On Hold">On Hold</option>
+                  </Form.Select>
+                </InputGroup>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
 
+        {/* Results Table */}
+        <Card className="shadow-sm">
+          <Card.Body className="p-0">
+            {filteredCandidates?.length > 0 ? (
+              <>
+                <div className="table-responsive">
+                  <Table hover className="mb-0 align-middle" style={{ fontSize: '0.875rem', borderCollapse: 'separate', borderSpacing: '0' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Sr#
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Gender
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Age
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Marital Status
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Maslak
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Caste
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Qualification
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Health
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Location
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Muslim Status
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Status
+                        </th>
+                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase text-center" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCandidates?.map((candidate, index) => ( 
+                        <tr 
+                          key={candidate._id} 
+                          className="border-bottom"
+                          style={{ 
+                            borderBottom: '1px solid #e9ecef'
+                          }}
+                        >
+                          <td className="py-3 px-3">
+                            <span className="fw-medium text-dark">
+                              {((batch - 1) * 50) + index + 1}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <Badge 
+                              bg={candidate.gender === 'Male' ? 'primary' : 'danger'}
+                              className="px-3 py-1 rounded-pill"
+                              style={{ fontSize: '0.75rem', fontWeight: '500' }}
+                            >
+                              {candidate.gender}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="fw-medium">{calculateAge(candidate.dob)}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-dark">{candidate.maritalStatus}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-muted">{candidate.maslak}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-muted">{candidate.caste}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-dark">{candidate.qualification}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-muted">{candidate.healthCondition}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <div className="d-flex align-items-center">
+                              <GeoAltFill className="text-muted me-1" size={12} />
+                              <span className="text-dark">{candidate.city}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-dark">{candidate.muslimStatus}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <Badge 
+                              bg={
+                                candidate.willingStatus.toLowerCase() === 'seeking' ? 'success' : 
+                                candidate.willingStatus.toLowerCase() === 'done' ? 'primary' : 'warning'
+                              }
+                              className="px-3 py-1 rounded-pill"
+                              style={{ fontSize: '0.75rem', fontWeight: '500' }}
+                            >
+                              {candidate.willingStatus}
+                            </Badge>
+                          </td>
+                          
+                          <td className="py-3 px-3">
+                            <div className="d-flex gap-1 justify-content-center">
+                              <Button 
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleShow('edit', candidate)}
+                                title="Edit"
+                                className="border-0 p-1"
+                                style={{ 
+                                  width: '32px', 
+                                  height: '32px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <PencilSquare size={12} />
+                              </Button>
+
+                              <Button
+                                variant="outline-success"
+                                size="sm"
+                                onClick={() => handleWillingnessChange(candidate._id, "Done")}
+                                title="Mark as Done"
+                                className="border-0 p-1"
+                                style={{ 
+                                  width: '32px', 
+                                  height: '32px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <CheckCircleFill size={12} />
+                              </Button>
+
+                              <Link to={`/candidates/${candidate._id}`}>
+                                <Button 
+                                  variant="outline-info" 
+                                  size="sm"
+                                  title="View Details"
+                                  className="border-0 p-1"
+                                  style={{ 
+                                    width: '32px', 
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <ThreeDotsVertical size={12} />
+                                </Button>
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+
+                {/* Pagination */}
+                <div className="p-3 border-top" style={{ backgroundColor: '#f8f9fa' }}>
+                  <Row className="align-items-center">
+                    <Col xs={4}>
+                      <Button
+                        variant="outline-primary"
+                        onClick={handlePrevBatch}
+                        disabled={batch === 1}
+                        size="sm"
+                      >
+                        <ChevronLeft size={16} />
+                        Previous
+                      </Button>
+                    </Col>
+                    
+                    <Col xs={4} className="text-center">
+                      <span className="text-muted fw-medium">
+                        Page {batch} of {totalBatches}
+                      </span>
+                    </Col>
+
+                    <Col xs={4} className="text-end">
+                      <Button
+                        variant="outline-primary"
+                        onClick={handleNextBatch}
+                        disabled={batch === totalBatches}
+                        size="sm"
+                      >
+                        Next
+                        <ChevronRight size={16} />
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-5">
+                <Search size={48} className="text-muted mb-3" />
+                <h5 className="text-muted">No candidates found</h5>
+                <p className="text-muted">Try adjusting your filters or search criteria.</p>
+                <Button variant="primary" onClick={resetFilters} size="sm">
+                  Reset Filters
+                </Button>
+              </div>
+            )}
           </Card.Body>
         </Card>
       </Container>
