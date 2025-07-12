@@ -1,0 +1,105 @@
+/* Modern Minimal Pagination Design */
+.modern-pagination {
+  gap: 12px;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.modern-pagination .page-item {
+  border: none;
+  margin: 0;
+}
+
+.modern-pagination .page-link {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  padding: 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.modern-pagination .page-link:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Number buttons */
+.pagination-number .page-link {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.pagination-number .page-link:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.pagination-number.active .page-link {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.pagination-number.active .page-link:hover {
+  background: #2563eb;
+}
+
+/* Arrow buttons */
+.pagination-arrow .page-link {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #fff;
+  color: #6366f1;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+}
+
+.pagination-arrow .page-link:hover {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+}
+
+.pagination-arrow.disabled .page-link {
+  background: #f8fafc;
+  color: #cbd5e1;
+  border-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.pagination-arrow.disabled .page-link:hover {
+  background: #f8fafc;
+  color: #cbd5e1;
+  border-color: #f1f5f9;
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  .modern-pagination {
+    gap: 8px;
+  }
+  
+  .pagination-number .page-link {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+  
+  .pagination-arrow .page-link {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  /* Show only arrows and current page on very small screens */
+  .pagination-number:not(.active):nth-child(n+4):nth-child(-n+10) {
+    display: none;
+  }
+}
