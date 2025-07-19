@@ -3,10 +3,10 @@ import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import BookAPI from '../../api/book';
-import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
+import { BookLanguage, BookStatus } from '../../enums/libraryEnums';
 import { PencilSquare, JournalPlus } from 'react-bootstrap-icons';
 
-const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => {
+const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate, genres }) => {
   const isCreateMode = mode === 'add';
 
   const { 
@@ -107,7 +107,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
               }}
         >
           <div className="bg-white p-4 rounded shadow-sm">
-            {/* Personal Information Section */}
+            {/* Basic Information Section */}
             <h5 className="mb-4">Basic Information</h5>
             <Row>
               <Col md={6}>
@@ -212,7 +212,7 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate }) => 
                     })}
                   >
                     <option value="">Select genre</option>
-                    {Object.values(BookGenre).map(genre => (
+                    {genres.map(genre => (
                       <option key={genre} value={genre}>{genre}</option>
                     ))}
                   </Form.Select>

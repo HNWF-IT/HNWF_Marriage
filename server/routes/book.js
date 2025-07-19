@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/book');
+const BookGenre = require('../models/bookGenre');
 
 // Create a new book
 router.post('/create', async (req, res) => {
@@ -9,19 +10,26 @@ router.post('/create', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing book data', data: {} });
     }
 
+    const genreName = req.body.genre;
+    const genreDoc = await BookGenre.findOne({ name: genreName });
+    if (!genreDoc) {
+      return res.status(400).json({ success: false, message: 'Invalid genre name', data: {} });
+    }
     const userId = req.user.id;
     const book = new Book({
       ...req.body,
+      genre: genreDoc._id,
       createdBy: userId,
       lastUpdatedBy: userId
     });
     await book.save();
 
-    res.status(201).json({ success: true, message: 'Book created successfully', data: book });
+    const populatedBook = await Book.findById(book._id).populate('genre');
+
+    res.status(201).json({ success: true, message: 'Book created successfully', data: populatedBook });
   } catch (err) {
-    /*** Unique constraint (ISBN) violation error handling */
-    if(err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
-      return res.status(400).json({ success: false, message: 'Book not Added. Duplicate ISBN', data: {} });
+    if (err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
+      return res.status(400).json({ success: false, message: 'Book not added. Duplicate ISBN', data: {} });
     }
     res.status(400).json({ success: false, message: 'Error creating book', data: err });
   }
@@ -31,8 +39,7 @@ router.post('/create', async (req, res) => {
 router.post('/list', async (req, res) => {
   try {
     const filters = req.body?.filters || {};
-    const books = await Book.find(filters);
-
+    const books = await Book.find(filters).populate('genre');
     res.status(200).json({ success: true, message: 'Books returned successfully', data: books });
   } catch (err) {
     res.status(400).json({ success: false, message: 'Error fetching books', data: err });
@@ -47,7 +54,7 @@ router.get('/get/:id', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing book ID', data: {} });
     }
 
-    const book = await Book.findById(id);
+    const book = await Book.findById(id).populate('genre');
     if (!book) {
       return res.status(404).json({ success: false, message: 'Book not found', data: {} });
     }
@@ -73,14 +80,15 @@ router.put('/update/:id', async (req, res) => {
     }
 
     const userId = req.user.id;
+
     const updatedBook = await Book.findByIdAndUpdate(
-      req.params.id,
-      {
-        updateData,
+      id,
+      { 
+        ...updateData,
         lastUpdatedBy: userId
       },
       { new: true }
-    );
+    ).populate('genre');
 
     if (!updatedBook) {
       return res.status(404).json({ success: false, message: 'Book not found', data: {} });
@@ -88,9 +96,8 @@ router.put('/update/:id', async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Book updated successfully', data: updatedBook });
   } catch (err) {
-    /*** Unique constraint (ISBN) violation error handling */
-    if(err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
-      return res.status(400).json({ success: false, message: 'Book Not Updated. Duplicate ISBN', data: {} });
+    if (err.code === 11000 && err.name === 'MongoServerError' && err.keyValue.isbn) {
+      return res.status(400).json({ success: false, message: 'Book not updated. Duplicate ISBN', data: {} });
     }
     res.status(400).json({ success: false, message: 'Error updating book', data: err });
   }
@@ -104,7 +111,7 @@ router.delete('/delete/:id', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing book ID', data: {} });
     }
 
-    const deletedBook = await Book.findByIdAndDelete(id);
+    const deletedBook = await Book.findByIdAndDelete(id).populate('genre');
     if (!deletedBook) {
       return res.status(404).json({ success: false, message: 'Book not found', data: {} });
     }
@@ -115,15 +122,17 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
-// Check Out a Book
+// Check Out or Return a Book
 router.put('/checkout', async (req, res) => {
   try {
     const { bookId, borrowerInfo, mode } = req.body;
-    if(!borrowerInfo.fullName || 
-      !borrowerInfo.contactNumber || 
-      !borrowerInfo.issueDate || 
-      !borrowerInfo.dueDate) {
-      return res.status(400).json({ success: false, message: 'Missing Borrower Info', data: {} });  
+    if (mode === 'checkout') {
+      if (!borrowerInfo?.fullName ||
+          !borrowerInfo?.contactNumber ||
+          !borrowerInfo?.issueDate ||
+          !borrowerInfo?.dueDate) {
+        return res.status(400).json({ success: false, message: 'Missing borrower info', data: {} });
+      }
     }
 
     let updateFields = {};
@@ -145,10 +154,10 @@ router.put('/checkout', async (req, res) => {
       bookId,
       updateFields,
       { new: true }
-    );
+    ).populate('genre');
 
     if (!updatedBook) {
-      return res.status(404).json({ success: false, error: 'Book not found', data: {} });
+      return res.status(404).json({ success: false, message: 'Book not found', data: {} });
     }
 
     return res.json({ success: true, message: 'Book status updated', data: updatedBook });

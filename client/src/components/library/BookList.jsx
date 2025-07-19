@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, InputGroup, Button, Collapse, Table, Pagination, Badge } from 'react-bootstrap';
-import { Book, BookmarkCheckFill, CollectionFill, PeopleFill, Search, PersonFill, PlusCircle, Sliders, GeoAlt, PencilSquare, ArrowLeftRight, BookmarkCheck, ExclamationTriangle } from 'react-bootstrap-icons';
+import { Book, BookmarkCheckFill, CollectionFill, PeopleFill, Search, PersonFill, PlusCircle, Sliders, GeoAlt, PencilSquare, ArrowLeftRight, BookmarkCheck, ExclamationTriangle, PlusCircleFill } from 'react-bootstrap-icons';
 import BookAPI from '../../api/book';
 import { useEffect } from 'react';
 import BookModal from './BookModal';
@@ -10,9 +10,11 @@ import StatsCardRow from '../commons/stats/StatsCardRow';
 import CheckOutBookModal from './CheckOutBookModal';
 import { toast } from 'react-toastify';
 import "../../assets/css/pagination.css"
+import Swal from 'sweetalert2';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
+  const [genres, setGenres] = useState([]);
   const [showBookModal, setShowBookModal] = useState(false);
   const [showCheckOutModal, setShowCheckOutModal] = useState(false);
   const [mode, setMode] = useState('');
@@ -31,23 +33,33 @@ const BookList = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchBooksAndGenres = async () => {
       setLoading(true);
       try {
-        const response = await BookAPI.getAllBooks();
-        if(response.data.success && response.data.data) {
-          setBooks(response.data.data);
+        const [booksRes, genresRes] = await Promise.all([
+          BookAPI.getAllBooks(),
+          BookAPI.getAllGenres()
+        ]);
+
+        if (booksRes.data.success && booksRes.data.data) {
+          setBooks(booksRes.data.data);
+        }
+
+        if (genresRes.data.success && genresRes.data.data) {
+          const allGenres = genresRes.data.data;
+          const genreNames = allGenres.map(genre => genre.name);
+          setGenres(genreNames);
         }
       } catch (error) {
         const message = error?.message || "Something went wrong";
         toast.error(message);
       } finally {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
         setLoading(false);
       }
     };
-  
-    fetchBooks();
+
+    fetchBooksAndGenres();
   }, []);
 
   // Filter books based on filters
@@ -202,6 +214,55 @@ const BookList = () => {
     }
   };
 
+  const handleAddGenre = async () => {
+    const { value: genreName } = await Swal.fire({
+      title: 'Enter Genre Name',
+      input: 'text',
+      inputLabel: 'Genre',
+      inputPlaceholder: 'e.g. Quran, Hadees, etc.',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Genre name is required!';
+        }
+        if (value.length < 3) {
+          return 'Genre name must be at least 3 characters long.';
+        }
+        return null;
+      },
+      showLoaderOnConfirm: true,
+      allowOutsideClick: () => !Swal.isLoading()
+    });
+
+    if (genreName.trim()) {
+      BookAPI.addBookGenre({ newGenre: genreName })
+      .then((response) => {
+        // onBookAddOrUpdate(response.data.data, mode);
+        toast.success(`Book genre added successfully`);
+      })
+      .catch((error) => {
+        let message = error.message || 'Something went wrong';
+
+        if (
+          error.response?.data?.success === false &&
+          error.response?.data?.message &&
+          error.status === 400
+        ) {
+          message = error.response.data.message;
+        }
+
+        toast.error(message);
+      });
+    }
+
+    /*
+    if (genreName) {
+      // You can now use the category name (e.g., send to backend)
+      Swal.fire('Saved!', `Genre "${genreName}" was added.`, 'success');
+    }
+    */
+  };
+
   if(loading) {
     return <><PulseDotLoader /></>
   }
@@ -214,6 +275,7 @@ const BookList = () => {
         show={showBookModal}
         handleClose={handleBookModalClose}
         onBookAddOrUpdate={handleBookAddOrUpdate}
+        genres={genres}
       /> : "" }
 
       <CheckOutBookModal 
@@ -247,13 +309,23 @@ const BookList = () => {
               </div>
               <div className="d-flex flex-wrap gap-2">
                 <Button 
+                  variant="light" 
+                  className="d-flex align-items-center shadow-sm"
+                  style={{ borderRadius: '12px' }}
+                  onClick={handleAddGenre}
+                >
+                  <PlusCircleFill className="me-2" size={18} />
+                  Genre
+                </Button>
+
+                <Button 
                   variant="success" 
                   className="d-flex align-items-center shadow-sm"
                   style={{ borderRadius: '12px' }}
                   onClick={() => handleBookModalShow('add', {})}
                 >
                   <PlusCircle className="me-2" size={18} />
-                  Add
+                  Book
                 </Button>
 
                 <Button 
@@ -292,7 +364,7 @@ const BookList = () => {
                             style={{ borderRadius: '10px' }}
                           >
                             <option value="">All Genres</option>
-                            {Object.values(BookGenre).map(genre => (
+                            {genres.map(genre => (
                               <option key={genre} value={genre}>{genre}</option>
                             ))}
                           </Form.Select>
@@ -468,7 +540,7 @@ const BookList = () => {
                           <td className="d-none d-md-table-cell text-muted">{book.author}</td>
                           <td className="d-none d-lg-table-cell text-muted">{book.publicationYear}</td>
                           <td className="d-none d-md-table-cell">
-                            <span className="badge bg-light text-dark border">{book.genre}</span>
+                            <span className="badge bg-light text-dark border">{book.genre?.name || "---"}</span>
                           </td>
                           <td className="d-none d-lg-table-cell">
                             <code className="text-muted">{book.isbn}</code>
