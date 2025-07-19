@@ -10,6 +10,7 @@ require("./db")({ connectToDb: true, initializeSeederFile: false });
 const { validateRequest } = require("./middlewares/auth");
 const candidateRoutes = require("./routes/candidate");
 const bookRoutes = require("./routes/book");
+const bookGenreRoutes = require('./routes/bookGenre');
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
 
@@ -31,6 +32,9 @@ app.use("/api/candidate", validateRequest, candidateRoutes);
 
 // Protected routes for books
 app.use("/api/book", validateRequest, bookRoutes);
+
+// Protected routes for book Genres
+app.use('/api/bookGenre', validateRequest, bookGenreRoutes);
 
 // Protected routes for books
 app.use("/api/user", validateRequest, userRoutes);

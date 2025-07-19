@@ -7,6 +7,10 @@ const BookAPI = {
   updateBook: (id, data) => axiosInstance.put(`/book/update/${id}`, data),
   deleteBook: (id) => axiosInstance.delete(`/book/${id}`),
   checkoutBook: (payload) => axiosInstance.put("/book/checkout", payload),
+  
+  // Book Genres
+  getAllGenres: () => axiosInstance.get('/bookGenre/list'),
+  addBookGenre: (data) => axiosInstance.post("/bookGenre/create", data),
 };
 
 export default BookAPI;

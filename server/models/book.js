@@ -7,15 +7,15 @@ const bookSchema = new mongoose.Schema({
   publicationYear: { type: String, required: true },
   publisher: { type: String, required: true },
   genre: { 
-    type: String, 
-    enum: ["Comparative Religion", "Islam", "Christianity", "Judaism"], 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'BookGenre',
     required: true 
   },
   isbn: { type: String, required: true, unique: true },
   status: { 
     type: String, 
     enum: ["Available", "Checked Out", "Reserved", "Lost"], 
-    required: true ,
+    required: true,
     default: "Available"
   },
   shelfLocation: { type: String },
@@ -32,13 +32,11 @@ const bookSchema = new mongoose.Schema({
   
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   lastUpdatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-},
-{
-  timestamps: true // This adds createdAt and updatedAt automatically
+},{
+  timestamps: true
 });
 
-// Create the model from the schema
+// Create the model
 const Book = mongoose.model('Book', bookSchema);
 
-// Export the model
 module.exports = Book;
