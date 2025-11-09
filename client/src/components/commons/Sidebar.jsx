@@ -21,55 +21,64 @@ const Sidebar = ({
 }) => {
   const navigate = useNavigate();
 
-  // Navigation items with role-based access control
-  // roles: [] means no role restriction - visible to all users
-  // roles: ['admin'] means only admin can see
-  // roles: ['admin', 'moderator'] means admin and moderator can see
+  // Navigation items with permission-based access control
   const rawNavLinks = [
     {
       name: "Dashboard",
       short: "D",
       path: "/dashboard",
       icon: <HouseDoor size={18} />,
-      roles: ["admin"], // Only admin can see Dashboard
+      requiresAdmin: true, // Only admin can see
     },
     {
       name: "Users",
       short: "U",
       path: "/users",
       icon: <People size={18} />,
-      roles: ["admin"], // Only admin can see Users
+      requiresAdmin: true, // Only admin can see
     },
     {
       name: "Marriage",
       short: "M",
       path: "/marriage",
       icon: <Heart size={18} />,
-      roles: ["admin", "moderator", "user"], // Admin, moderator, and user can see
+      requiredPermission: "marriage", // Requires 'marriage' in appPermissions
     },
     {
       name: "Library",
       short: "L",
       path: "/library",
       icon: <Book size={18} />,
-      roles: ["admin", "moderator", "user"], // Admin, moderator, and user can see
+      requiredPermission: "library", // Requires 'library' in appPermissions
     },
   ];
 
   // Get logged in user from localStorage
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userRole = user.role || "guest"; // Default to 'guest' if no role
+  const userRole = user.role || "guest";
+  const userPermissions = user.appPermissions || [];
 
-  // Memoized navLinks based on user role
+  // Memoized navLinks based on user role and permissions
   const navLinks = useMemo(() => {
     return rawNavLinks.filter(link => {
-      // If no roles specified, show to everyone
-      if (!link.roles || link.roles.length === 0) return true;
-      
-      // Check if user's role is in the allowed roles
-      return link.roles.includes(userRole);
+      // Admin-only links
+      if (link.requiresAdmin) {
+        return userRole === 'admin';
+      }
+
+      // Permission-based links
+      if (link.requiredPermission) {
+        // Admin has access to all permissions
+        if (userRole === 'admin') return true;
+
+        // Check if member has the required permission
+        return userPermissions.includes(link.requiredPermission);
+      }
+
+      // If no restrictions, show to everyone
+      return true;
     });
-  }, [userRole]);
+  }, [userRole, userPermissions]);
 
   const sidebarStyles = {
     sidebar: {

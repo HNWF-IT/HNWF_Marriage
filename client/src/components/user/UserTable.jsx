@@ -19,7 +19,7 @@ import {
   Trash,
 } from 'react-bootstrap-icons';
 
-const UserTable = ({ users, onUserModalShow, onStatusToggle, setSelectedUser, setShowDeleteModal }) => {
+const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, setSelectedUser, setShowDeleteModal }) => {
   const getStatusBadge = (status) => {
     return status ? <Badge bg="success">Active</Badge> : <Badge bg="secondary">Inactive</Badge>;
   };
@@ -125,7 +125,7 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, setSelectedUser, se
                               border: '1px solid #0dcaf0',
                               borderRadius: '6px',
                             }}
-                            onClick={() => console.log('Handle reset password')}
+                            onClick={() => onResetPassword(user)}
                           >
                             <KeyFill size={12} />
                           </Button>

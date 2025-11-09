@@ -17,6 +17,11 @@ router.post('/create', async (req, res) => {
     // Validate user
     // await signUpSchema.validate(req.body, { abortEarly: true });
 
+    // Hash password before creating user
+    if (userData.password) {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    }
+
     const newUser = new User(userData);
     const savedUser = await newUser.save();
 
@@ -112,6 +117,11 @@ router.put('/update/:id', async (req, res) => {
       });
     }
 
+    // Hash password if it's being updated
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true
     }).select('-password');
@@ -123,6 +133,52 @@ router.put('/update/:id', async (req, res) => {
     res.status(200).json({ success: true, message: 'User updated successfully', data: updatedUser });
   } catch (err) {
     res.status(400).json({ success: false, message: 'Error updating user', data: err });
+  }
+});
+
+// PATCH: Reset user password by ID
+router.patch('/reset-password/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { newPassword } = req.body;
+
+    if (!userId || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing user ID or new password',
+        data: {}
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update only the password field
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: {}
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully',
+      data: updatedUser
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: 'Error resetting password',
+      data: err
+    });
   }
 });
 

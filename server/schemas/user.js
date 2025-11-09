@@ -6,8 +6,8 @@ const signUpSchema = yup.object().shape({
   status: yup.boolean().required(),
   phoneNo: yup.string().required(),
   username: yup.string().required(),
-  role: yup.string().oneOf(['admin', 'user', 'member']).required(),
-  appPermission: yup.array().of(yup.string().oneOf(['marriage', 'library'])).default([])
+  role: yup.string().oneOf(['admin', 'member']).required(),
+  appPermissions: yup.array().of(yup.string().oneOf(['marriage', 'library'])).default([])
 }).noUnknown(true, 'Extra fields are not allowed');
 
 const loginSchema = yup.object().shape({

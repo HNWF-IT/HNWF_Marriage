@@ -11,6 +11,7 @@ import isLoggedIn from "../utils";
 import BookList from "../components/library/BookList";
 import CandidateProfile from "../components/candidate/CandidateProfile";
 import AdminUserManagement from "../components/user/AdminUserManagement";
+import ProtectedRoute from "../components/commons/ProtectedRoute";
 
 let ROUTES = <></>;
 
@@ -19,11 +20,52 @@ if (isLoggedIn()) {
   ROUTES = <>
     <Route path="/" element={<Layout />}>
       <Route path="login" element={<Login />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="marriage" element={<CandidateDashboard />} />
-      <Route path="/candidates/:id" element={<CandidateProfile />} />
-      <Route path="library" element={<BookList />} />
-      <Route path="users" element={<AdminUserManagement />} />
+
+      {/* Admin-only routes */}
+      <Route
+        path="dashboard"
+        element={
+          <ProtectedRoute requiresAdmin={true}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="users"
+        element={
+          <ProtectedRoute requiresAdmin={true}>
+            <AdminUserManagement />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Marriage app routes - requires 'marriage' permission */}
+      <Route
+        path="marriage"
+        element={
+          <ProtectedRoute requiredPermission="marriage">
+            <CandidateDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/candidates/:id"
+        element={
+          <ProtectedRoute requiredPermission="marriage">
+            <CandidateProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Library app routes - requires 'library' permission */}
+      <Route
+        path="library"
+        element={
+          <ProtectedRoute requiredPermission="library">
+            <BookList />
+          </ProtectedRoute>
+        }
+      />
     </Route>
   </>
 } else {
