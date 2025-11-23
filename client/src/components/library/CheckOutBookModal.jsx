@@ -55,17 +55,18 @@ const CheckOutBookModal = ({ show, onHide, onSubmit, book, mode }) => {
   };
 
   return (
-    <Modal 
-      show={show} 
-      onHide={handleClose} 
-      backdrop="static" 
-      centered 
+    <Modal
+      show={show}
+      onHide={handleClose}
+      backdrop="static"
+      centered
       size="md"
+      className="modal-modern"
     >
-      <Modal.Header 
-        closeButton 
+      <Modal.Header
+        closeButton
         closeVariant="white"
-        className="bg-primary text-white border-0 py-2"
+        className="py-2"
       >
         <Modal.Title className="d-flex align-items-center fs-6">
           <BookFill className="me-2" size={20} />
@@ -74,9 +75,9 @@ const CheckOutBookModal = ({ show, onHide, onSubmit, book, mode }) => {
       </Modal.Header>
 
       <Form onSubmit={handleSubmit(handleFormSubmit)}>
-        <Modal.Body className="p-3">
+        <Modal.Body>
           {/* Book Information Card */}
-          <Card className="mb-3 border-0 bg-light">
+          <Card className="modal-section border-0">
             <Card.Body className="p-2">
               <h6 className="mb-2 text-primary d-flex align-items-center">
                 <BookFill className="me-1" size={16} />

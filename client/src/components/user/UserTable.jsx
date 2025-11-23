@@ -21,7 +21,11 @@ import {
 
 const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, setSelectedUser, setShowDeleteModal }) => {
   const getStatusBadge = (status) => {
-    return status ? <Badge bg="success">Active</Badge> : <Badge bg="secondary">Inactive</Badge>;
+    return status ? (
+      <Badge bg="success" className="px-3 py-2 rounded-pill">Active</Badge>
+    ) : (
+      <Badge bg="secondary" className="px-3 py-2 rounded-pill">Inactive</Badge>
+    );
   };
 
   const getRoleBadge = (role) => {
@@ -30,27 +34,27 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
       Manager: 'warning',
       Employee: 'primary',
     };
-    return <Badge bg={variants[role] || 'secondary'}>{role}</Badge>;
+    return <Badge bg={variants[role] || 'secondary'} className="px-3 py-2 rounded-pill">{role}</Badge>;
   };
 
   return (
-    <Card className="shadow-sm">
+    <Card className="card-modern-glass">
       <Card.Body className="p-0">
         <div className="table-responsive">
-          <Table hover className="mb-0">
-            <thead className="bg-light">
+          <Table hover className="mb-0 table-borderless">
+            <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
               <tr>
-                <th className="border-0 py-3">User</th>
-                <th className="border-0 py-3">Role</th>
-                <th className="border-0 py-3">Contact</th>
-                <th className="border-0 py-3">Status</th>
-                <th className="border-0 py-3 text-center">Actions</th>
+                <th className="py-3 px-4 text-muted fw-semibold">User</th>
+                <th className="py-3 px-4 text-muted fw-semibold">Role</th>
+                <th className="py-3 px-4 text-muted fw-semibold">Contact</th>
+                <th className="py-3 px-4 text-muted fw-semibold">Status</th>
+                <th className="py-3 px-4 text-muted fw-semibold text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user._id}>
-                  <td className="py-3">
+                <tr key={user._id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                  <td className="py-3 px-4">
                     <div className="d-flex align-items-center">
                       <div
                         className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
@@ -67,8 +71,8 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
                       </div>
                     </div>
                   </td>
-                  <td className="py-3">{getRoleBadge(user.role)}</td>
-                  <td className="py-3">
+                  <td className="py-3 px-4">{getRoleBadge(user.role)}</td>
+                  <td className="py-3 px-4">
                     <div>
                       <small className="d-block">
                         <Telephone size={12} className="me-1" />
@@ -80,8 +84,8 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
                       </small>
                     </div>
                   </td>
-                  <td className="py-3">{getStatusBadge(user.status)}</td>
-                  <td className="py-3">
+                  <td className="py-3 px-4">{getStatusBadge(user.status)}</td>
+                  <td className="py-3 px-4">
                     <div style={{ width: 'fit-content' }}>
                       {/* First Row - Activate/Deactivate and Reset Password */}
                       <div className="d-flex gap-1 mb-1">
@@ -95,16 +99,10 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
                           }
                         >
                           <Button
-                            size="sm"
                             variant={user.status ? 'outline-danger' : 'outline-success'}
-                            className="p-1 d-flex align-items-center justify-content-center"
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              border: user.status ? '1px solid #dc3545' : '1px solid #198754',
-                              borderRadius: '6px',
-                            }}
+                            className="btn-icon-sm"
                             onClick={() => onStatusToggle(user)}
+                            title={user.status ? 'Deactivate' : 'Activate'}
                           >
                             {user.status ? <PersonX size={12} /> : <PersonCheck size={12} />}
                           </Button>
@@ -116,16 +114,10 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
                           overlay={<Tooltip>Reset Password</Tooltip>}
                         >
                           <Button
-                            size="sm"
-                            variant="outline-info"
-                            className="p-1 d-flex align-items-center justify-content-center"
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              border: '1px solid #0dcaf0',
-                              borderRadius: '6px',
-                            }}
+                            variant="outline-primary"
+                            className="btn-icon-sm"
                             onClick={() => onResetPassword(user)}
+                            title="Reset Password"
                           >
                             <KeyFill size={12} />
                           </Button>
@@ -139,17 +131,10 @@ const UserTable = ({ users, onUserModalShow, onStatusToggle, onResetPassword, se
                           overlay={<Tooltip>Edit User</Tooltip>}
                         >
                           <Button
-                            size="sm"
-                            variant="outline-warning"
-                            className="p-1 d-flex align-items-center justify-content-center"
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              border: '1px solid',
-                              borderColor: 'warning',
-                              borderRadius: '6px',
-                            }}
+                            variant="outline-primary"
+                            className="btn-icon-sm"
                             onClick={() => onUserModalShow('edit', user)}
+                            title="Edit User"
                           >
                             <PencilSquare size={12} />
                           </Button>

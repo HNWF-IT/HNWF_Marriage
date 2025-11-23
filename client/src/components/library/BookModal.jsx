@@ -86,29 +86,28 @@ const BookModal = ({ mode, bookData, show, handleClose, onBookAddOrUpdate, genre
       size="lg"
       centered
       backdrop="static"
+      className="modal-modern"
     >
       <Modal.Header
         closeButton
         closeVariant="white"
-        className={isCreateMode ? 'bg-primary text-white' : 'bg-warning text-white'}
       >
         <Modal.Title>
-          {isCreateMode ? <JournalPlus className="me-2" /> : <PencilSquare className="me-2" />}  
+          {isCreateMode ? <JournalPlus className="me-2" /> : <PencilSquare className="me-2" />}
           {isCreateMode ? "Add New Book" : "Edit Book"}
         </Modal.Title>
       </Modal.Header>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Modal.Body 
-            className="bg-light"
+        <Modal.Body
             style={{
                 maxHeight: "70vh",
                 overflowY: "auto",
               }}
         >
-          <div className="bg-white p-4 rounded shadow-sm">
+          <div className="modal-section">
             {/* Basic Information Section */}
-            <h5 className="mb-4">Basic Information</h5>
+            <h5 className="modal-section-header">Basic Information</h5>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">

@@ -14,11 +14,7 @@ const StatsCard = ({ icon, label, value, bgColor, textColor }) => {
 
   return (
     <Card
-      className={`p-3 rounded ${bgColor} text-start border-0`}
-      style={{
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        transformOrigin: 'center'
-      }}
+      className={`stat-card-glass p-3 text-start ${bgColor}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

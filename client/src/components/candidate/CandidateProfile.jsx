@@ -54,103 +54,49 @@ const CandidateProfile = () => {
   };
   */
 
-  // Custom styles for elements not easily styled with Bootstrap classes
-  const styles = {
-    header: {
-      background: 'linear-gradient(to right, #4c6c44, #1e7e34)',
-      color: 'white',
-      padding: '2rem',
-      position: 'relative'
-    },
-    headerOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      opacity: 0.1,
-      backgroundColor: 'white'
-    },
-    headerContent: {
-      position: 'relative',
-      zIndex: 10
-    },
-    photoPlaceholder: {
-      width: '160px',
-      height: '160px',
-      borderRadius: '50%',
-      background: 'white',
-      border: '4px solid white',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#adb5bd',
-      fontSize: '1.25rem',
-      marginBottom: '1rem'
-    },
-    sectionIcon: {
-      width: '24px',
-      height: '24px',
-      borderRadius: '50%',
-      backgroundColor: '#e8f5e9',
-      color: '#28a745',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: '0.5rem',
-      fontSize: '0.875rem'
-    },
-    footer: {
-      background: '#1e7e34',
-      color: 'white',
-      padding: '1.5rem',
-      marginTop: '2rem'
-    }
-  };
 
   if(loading) {
     return <>Loading...</>
   }
 
   return (
-    <Container className="my-4" style={{ maxWidth: '1000px' }}>
+    <Container fluid className="container-page-fluid">
       {/* Decorative header */}
-      <div style={styles.header}>
-        <div style={styles.headerOverlay}></div>
-        <div style={styles.headerContent}>
-          <h1 className="display-5 fw-bold">Matrimonial Profile</h1>
-          <p className="text-light mt-2">Reference ID: MA-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</p>
-        </div>
-      </div>
+      <Card className="card-modern-glass mb-4">
+        <Card.Body className="p-4 bg-gradient-primary text-white">
+          <h1 className="display-5 fw-bold mb-2">Matrimonial Profile</h1>
+          <p className="text-light mb-0">Reference ID: MA-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</p>
+        </Card.Body>
+      </Card>
 
       {candidate ? (
         <>
           {/* Main Content */}
-          <div className="bg-light p-4">
-            {/* Top section with name and primary info */}
-            <Row className="mb-4 pb-3 border-bottom">
-              <Col xs={12} md={3} className="d-flex justify-content-center">
-                <div style={styles.photoPlaceholder}>
-                  <span>Photo</span>
-                </div>
-              </Col>
+          <Card className="card-modern-glass mb-4">
+            <Card.Body className="p-4">
+              {/* Top section with name and primary info */}
+              <Row className="mb-4 pb-3 border-bottom">
+                <Col xs={12} md={3} className="d-flex justify-content-center">
+                  <div className="profile-photo-placeholder">
+                    <span className="text-muted fs-lg">Photo</span>
+                  </div>
+                </Col>
               <Col xs={12} md={9}>
                 <h2 className="fw-bold text-dark">{candidate.name}</h2>
                 <p className="text-success fw-medium">
                   {candidate.qualification} • {candidate.sourceOfIncome}
                 </p>
                 <div className="d-flex flex-wrap gap-2 mt-3">
-                  <Badge bg="success" className="rounded-pill p-2">
+                  <Badge bg="success" className="rounded-pill px-3 py-2">
                     {calculateAge(candidate.dob)} Years
                   </Badge>
-                  <Badge bg="success" className="rounded-pill p-2">
+                  <Badge bg="success" className="rounded-pill px-3 py-2">
                     {candidate.height}
                   </Badge>
-                  <Badge bg="success" className="rounded-pill p-2">
+                  <Badge bg="success" className="rounded-pill px-3 py-2">
                     {candidate.city}
                   </Badge>
-                  <Badge bg="success" className="rounded-pill p-2">
+                  <Badge bg="success" className="rounded-pill px-3 py-2">
                     {candidate.maslak}
                   </Badge>
                 </div>
@@ -161,10 +107,10 @@ const CandidateProfile = () => {
             <Row className="g-4">
               {/* Personal Details */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>👤</span>
+                      <span className="profile-section-icon">👤</span>
                       Personal Details
                     </h3>
                   </Card.Header>
@@ -197,10 +143,10 @@ const CandidateProfile = () => {
 
               {/* Family Background */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>👪</span>
+                      <span className="profile-section-icon">👪</span>
                       Family Background
                     </h3>
                   </Card.Header>
@@ -233,10 +179,10 @@ const CandidateProfile = () => {
 
               {/* Education & Career */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>🎓</span>
+                      <span className="profile-section-icon">🎓</span>
                       Education & Career
                     </h3>
                   </Card.Header>
@@ -257,10 +203,10 @@ const CandidateProfile = () => {
 
               {/* Religious Information */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>🕌</span>
+                      <span className="profile-section-icon">🕌</span>
                       Religious Information
                     </h3>
                   </Card.Header>
@@ -281,10 +227,10 @@ const CandidateProfile = () => {
 
               {/* Residence */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>🏠</span>
+                      <span className="profile-section-icon">🏠</span>
                       Residence
                     </h3>
                   </Card.Header>
@@ -313,10 +259,10 @@ const CandidateProfile = () => {
 
               {/* Contact */}
               <Col xs={12} md={6}>
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 glass-card-light">
                   <Card.Header className="bg-white border-bottom-0">
                     <h3 className="h5 mb-0">
-                      <span style={styles.sectionIcon}>📱</span>
+                      <span className="profile-section-icon">📱</span>
                       Contact Information
                     </h3>
                   </Card.Header>
@@ -331,19 +277,22 @@ const CandidateProfile = () => {
                 </Card>
               </Col>
             </Row>
-          </div>
+            </Card.Body>
+          </Card>
 
           {/* Footer */}
-          <div style={styles.footer}>
-            <Row>
-              <Col xs={12} md={6}>
-                <p className="mb-md-0">Generated on {new Date().toLocaleDateString()}</p>
-              </Col>
-              <Col xs={12} md={6} className="text-md-end">
-                <p className="mb-0">Confidential - For matrimonial purposes only</p>
-              </Col>
-            </Row>
-          </div>
+          <Card className="card-modern-glass">
+            <Card.Body className="p-4 bg-success text-white">
+              <Row>
+                <Col xs={12} md={6}>
+                  <p className="mb-md-0">Generated on {new Date().toLocaleDateString()}</p>
+                </Col>
+                <Col xs={12} md={6} className="text-md-end">
+                  <p className="mb-0">Confidential - For matrimonial purposes only</p>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
           
         </>
       ) : "No Candidate Found"}

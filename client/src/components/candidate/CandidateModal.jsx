@@ -113,29 +113,29 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
   };
 
   return (
-    <Modal 
-      show={show} 
+    <Modal
+      show={show}
       onHide={closeModal}
       size="lg"
       centered
       backdrop="static"
+      className="modal-modern"
     >
-      <Modal.Header closeButton closeVariant="white" className="text-white" style={{backgroundColor: "#4C6C44"}}>
+      <Modal.Header closeButton closeVariant="white">
         <Modal.Title>{mode === "edit" ? "Edit Candidate" : "Add New Candidate"}</Modal.Title>
       </Modal.Header>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Modal.Body 
-            className="bg-light"
+        <Modal.Body
             style={{
                 maxHeight: "70vh",
                 overflowY: "auto",
               }}
         >
-          <div className="bg-white p-4 rounded shadow-sm">
+          <div className="modal-section">
             {/* Personal Information Section */}
-            <h5 className="mb-4" style={{color: "#A49559"}}>Personal Information</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Personal Information</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Full Name</Form.Label>
@@ -212,10 +212,12 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Contact Information Section */}
-            <h5 className="mb-4" style={{color: "#4C6C44"}}>Contact Information</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Contact Information</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Phone Number</Form.Label>
@@ -237,10 +239,12 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Family Background Section */}
-            <h5 className="mb-4" style={{color: "#A49559"}}>Family Background</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Family Background</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Father Name</Form.Label>
@@ -336,10 +340,12 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Educational Background Section */}
-            <h5 className="mb-4" style={{color: "#4C6C44"}}>Educational Background</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Educational Background</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Qualification</Form.Label>
@@ -362,10 +368,12 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Professional Information Section */}
-            <h5 className="mb-4" style={{color: "#A49559"}}>Professional Information</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Professional Information</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Income Amount (In Rupees)</Form.Label>
@@ -417,11 +425,13 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-            </Row>  
-            
+            </Row>
+          </div>
+
+          <div className="modal-section">
             {/* Residential Information Section */}
-            <h5 className="mb-4" style={{color: "#4C6C44"}}>Residential Information</h5>
-            <Row className="mb-4">
+            <h5 className="modal-section-header">Residential Information</h5>
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>House Size</Form.Label>
@@ -510,9 +520,11 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Physical Appearance Section */}
-            <h5 className="mb-4" style={{color: "#A49559"}}>Physical Appearance</h5>
+            <h5 className="modal-section-header">Physical Appearance</h5>
             <Row>
             <Col md={12}>
                 <Form.Group className="mb-3">
@@ -560,9 +572,11 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
                 </Form.Group>
               </Col>
             </Row>
+          </div>
 
+          <div className="modal-section">
             {/* Additional Information Section */}
-            <h5 className="mb-4" style={{color: "#4C6C44"}}>Additional Information</h5>
+            <h5 className="modal-section-header">Additional Information</h5>
             <Row>
               <Col md={4}>
                 <Form.Group className="mb-3">
@@ -666,12 +680,12 @@ const CandidateModal = ({ mode, candidateData, show, handleClose, onCandidateAdd
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={closeModal} style={{backgroundColor: "#A49559"}}>
+          <Button onClick={closeModal} variant="secondary">
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            style={{backgroundColor: "#4C6C44"}}
+          <Button
+            type="submit"
+            variant="primary"
             // disabled={!isDirty || !isValid}
           >
             {mode === 'add' ? "Add" : "Update"}

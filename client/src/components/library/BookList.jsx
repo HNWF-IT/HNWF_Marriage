@@ -5,8 +5,10 @@ import BookAPI from '../../api/book';
 import { useEffect } from 'react';
 import BookModal from './BookModal';
 import { BookGenre, BookLanguage, BookStatus } from '../../enums/libraryEnums';
-import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import CenteredLoader from '../commons/spinner/CenteredLoader';
 import StatsCardRow from '../commons/stats/StatsCardRow';
+import SectionHeader from '../commons/headers/SectionHeader';
+import PageHeader from '../commons/headers/PageHeader';
 import CheckOutBookModal from './CheckOutBookModal';
 import { toast } from 'react-toastify';
 import "../../assets/css/pagination.css"
@@ -264,7 +266,7 @@ const BookList = () => {
   };
 
   if(loading) {
-    return <><PulseDotLoader /></>
+    return <CenteredLoader message="Loading Books..." />
   }
 
   return (
@@ -286,52 +288,45 @@ const BookList = () => {
         mode={selectedBook?.status === 'Checked Out' ? 'return' : 'checkout'}
       />
 
-      <Container fluid className="px-3 px-lg-4 py-4 bg-light" style={{ 
-        minHeight: '100vh'
-      }}>
-        <div className="mb-4">
-          <h1 className="display-5 fw-bold text-dark mb-2">📚 Library Management System</h1>
-          <p className="lead text-muted mb-4">Manage your book collection efficiently</p>
-        </div>
+      <Container fluid className="container-page-fluid">
+        <PageHeader
+          icon={<Book size={32} />}
+          title="Library Management"
+          subtitle="Manage your book collection efficiently"
+        />
 
-        <Card className="border-0 shadow-lg" style={{ 
-          borderRadius: '20px',
-          background: 'rgba(255, 255, 255, 0.98)'
-        }}>
+        <Card className="card-modern-glass">
           <Card.Body className="p-4">
             {/* Header Section */}
-            <div className="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+            <div className="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center subsection-spacing gap-3">
               <div>
-                <h2 className="h3 mb-2 text-dark fw-bold">Book Collection</h2>
-                <p className="text-muted mb-0">
+                <SectionHeader title="Book Collection" size="small" className="mb-2" />
+                <p className="text-muted mb-0 fs-sm">
                   {filteredBooks.length} of {books.length} books
                 </p>
               </div>
               <div className="d-flex flex-wrap gap-2">
-                <Button 
-                  variant="light" 
-                  className="d-flex align-items-center shadow-sm"
-                  style={{ borderRadius: '12px' }}
+                <Button
+                  variant="light"
+                  className="d-flex align-items-center btn-modern shadow-sm"
                   onClick={handleAddGenre}
                 >
                   <PlusCircleFill className="me-2" size={18} />
                   Genre
                 </Button>
 
-                <Button 
-                  variant="success" 
-                  className="d-flex align-items-center shadow-sm"
-                  style={{ borderRadius: '12px' }}
+                <Button
+                  variant="success"
+                  className="d-flex align-items-center btn-modern shadow-sm"
                   onClick={() => handleBookModalShow('add', {})}
                 >
                   <PlusCircle className="me-2" size={18} />
                   Book
                 </Button>
 
-                <Button 
+                <Button
                   variant={showFilters ? "primary" : "outline-primary"}
-                  className="d-flex align-items-center shadow-sm"
-                  style={{ borderRadius: '12px' }}
+                  className="d-flex align-items-center btn-modern shadow-sm"
                   onClick={() => setShowFilters(!showFilters)}
                 >
                   <Sliders className="me-2" size={18} />
@@ -348,20 +343,21 @@ const BookList = () => {
             {/* Filters Section */}
             <Collapse in={showFilters}>
               <div className="mb-4">
-                <Card className="border-0 bg-light" style={{ borderRadius: '15px' }}>
+                <Card className="glass-card-light">
                   <Card.Body className="p-4">
-                    <h5 className="mb-3 text-dark fw-semibold">
-                      <Sliders className="me-2" size={20} />
-                      Filter Options
-                    </h5>
-                    <Row className="g-3">
+                    <SectionHeader
+                      icon={<Sliders size={20} />}
+                      title="Filter Options"
+                      size="small"
+                      className="mb-3"
+                    />
+                    <Row className="g-3 form-modern">
                       <Col lg={3} md={6}>
                         <Form.Group>
                           <Form.Label className="fw-medium text-dark">Genre</Form.Label>
-                          <Form.Select 
+                          <Form.Select
                             value={filters.genre}
                             onChange={(e) => handleFilterChange('genre', e.target.value)}
-                            style={{ borderRadius: '10px' }}
                           >
                             <option value="">All Genres</option>
                             {genres.map(genre => (
@@ -370,14 +366,13 @@ const BookList = () => {
                           </Form.Select>
                         </Form.Group>
                       </Col>
-                      
+
                       <Col lg={3} md={6}>
                         <Form.Group>
                           <Form.Label className="fw-medium text-dark">Status</Form.Label>
                           <Form.Select
                             value={filters.status}
                             onChange={(e) => handleFilterChange('status', e.target.value)}
-                            style={{ borderRadius: '10px' }}
                           >
                             <option value="">All Status</option>
                             {Object.values(BookStatus).map(status => (
@@ -386,14 +381,13 @@ const BookList = () => {
                           </Form.Select>
                         </Form.Group>
                       </Col>
-                      
+
                       <Col lg={3} md={6}>
                         <Form.Group>
                           <Form.Label className="fw-medium text-dark">Language</Form.Label>
                           <Form.Select
                             value={filters.language}
                             onChange={(e) => handleFilterChange('language', e.target.value)}
-                            style={{ borderRadius: '10px' }}
                           >
                             <option value="">All Languages</option>
                             {Object.values(BookLanguage).map(lang => (
@@ -402,13 +396,12 @@ const BookList = () => {
                           </Form.Select>
                         </Form.Group>
                       </Col>
-                      
+
                       <Col lg={3} md={6} className="d-flex align-items-end">
-                        <Button 
+                        <Button
                           variant="outline-secondary"
-                          className="w-100"
+                          className="w-100 btn-modern"
                           onClick={resetFilters}
-                          style={{ borderRadius: '10px' }}
                         >
                           Clear Filters
                         </Button>
@@ -420,19 +413,18 @@ const BookList = () => {
             </Collapse>
 
             {/* Search Section */}
-            <Row className="mb-4 g-3">
+            <Row className="mb-4 g-3 form-glass">
               <Col lg={6}>
                 <Form.Group>
                   <Form.Label className="fw-medium text-dark">Search by Title</Form.Label>
                   <InputGroup>
-                    <InputGroup.Text style={{ borderRadius: '10px 0 0 10px', border: 'none', background: '#f8f9fa' }}>
+                    <InputGroup.Text>
                       <Search size={18} className="text-muted" />
                     </InputGroup.Text>
                     <Form.Control
                       placeholder="Enter book title..."
                       value={filters.title}
                       onChange={(e) => handleFilterChange('title', e.target.value)}
-                      style={{ borderRadius: '0 10px 10px 0', border: 'none', background: '#f8f9fa' }}
                     />
                   </InputGroup>
                 </Form.Group>
@@ -441,14 +433,13 @@ const BookList = () => {
                 <Form.Group>
                   <Form.Label className="fw-medium text-dark">Search by Author</Form.Label>
                   <InputGroup>
-                    <InputGroup.Text style={{ borderRadius: '10px 0 0 10px', border: 'none', background: '#f8f9fa' }}>
+                    <InputGroup.Text>
                       <PersonFill size={18} className="text-muted" />
                     </InputGroup.Text>
                     <Form.Control
                       placeholder="Enter author name..."
                       value={filters.author}
                       onChange={(e) => handleFilterChange('author', e.target.value)}
-                      style={{ borderRadius: '0 10px 10px 0', border: 'none', background: '#f8f9fa' }}
                     />
                   </InputGroup>
                 </Form.Group>
@@ -456,69 +447,58 @@ const BookList = () => {
             </Row>
 
             {/* Books Table */}
-            <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
-              <Card.Body className="p-0">
-                <div className="table-responsive">
-                  <Table className="align-middle mb-0">
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid #e9ecef' }}>
-                        <th className="fw-semibold border-0 py-3 ps-4 text-uppercase" style={{ 
+            <div className="table-responsive">
+              <Table className="align-middle mb-0 table-borderless">
+                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
+                      <tr>
+                        <th className="py-3 ps-4 text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Serial</th>
-                        <th className="fw-semibold border-0 py-3 text-uppercase" style={{ 
+                        <th className="py-3 px-4 text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Book Title</th>
-                        <th className="fw-semibold border-0 py-3 d-none d-md-table-cell text-uppercase" style={{ 
+                        <th className="py-3 px-4 d-none d-md-table-cell text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Author Name</th>
-                        <th className="fw-semibold border-0 py-3 d-none d-lg-table-cell text-uppercase" style={{ 
+                        <th className="py-3 px-4 d-none d-lg-table-cell text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Publication Year</th>
-                        <th className="fw-semibold border-0 py-3 d-none d-md-table-cell text-uppercase" style={{ 
+                        <th className="py-3 px-4 d-none d-md-table-cell text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Book Genre</th>
-                        <th className="fw-semibold border-0 py-3 d-none d-lg-table-cell text-uppercase" style={{ 
+                        <th className="py-3 px-4 d-none d-lg-table-cell text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>ISBN Number</th>
-                        <th className="fw-semibold border-0 py-3 text-uppercase" style={{ 
+                        <th className="py-3 px-4 text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Book Status</th>
-                        <th className="fw-semibold border-0 py-3 d-none d-lg-table-cell text-uppercase" style={{ 
+                        <th className="py-3 px-4 d-none d-lg-table-cell text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Shelf Location</th>
-                        <th className="fw-semibold border-0 py-3 pe-4 text-uppercase" style={{ 
+                        <th className="py-3 pe-4 text-muted fw-semibold text-uppercase" style={{
                           fontSize: '0.75rem',
-                          letterSpacing: '0.5px',
-                          color: '#6c757d'
+                          letterSpacing: '0.5px'
                         }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {currentPageBooks.map((book, index) => (
-                        <tr key={book.id} className="border-0" style={{ 
-                          borderBottom: '1px solid #f1f3f4',
+                        <tr key={book.id} style={{
+                          borderBottom: '1px solid #f0f0f0',
                           transition: 'all 0.2s ease'
                         }}>
-                          <td className="ps-4 fw-medium text-muted">
+                          <td className="ps-4 py-3 fw-medium text-muted">
                             {(((currentPage - 1) * 50) + (index + 1))}
                           </td>
-                          <td className="py-3">
+                          <td className="py-3 px-4">
                             <div className="d-flex align-items-center">
                               <div style={{ 
                                 width: '30px',
@@ -537,22 +517,20 @@ const BookList = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="d-none d-md-table-cell text-muted">{book.author}</td>
-                          <td className="d-none d-lg-table-cell text-muted">{book.publicationYear}</td>
-                          <td className="d-none d-md-table-cell">
-                            <span className="badge bg-light text-dark border">{book.genre?.name || "---"}</span>
+                          <td className="py-3 px-4 d-none d-md-table-cell text-muted">{book.author}</td>
+                          <td className="py-3 px-4 d-none d-lg-table-cell text-muted">{book.publicationYear}</td>
+                          <td className="py-3 px-4 d-none d-md-table-cell">
+                            <Badge bg="light" text="dark" className="border px-3 py-2 rounded-pill">{book.genre?.name || "---"}</Badge>
                           </td>
-                          <td className="d-none d-lg-table-cell">
+                          <td className="py-3 px-4 d-none d-lg-table-cell">
                             <code className="text-muted">{book.isbn}</code>
                           </td>
-                          <td>
-                            <Badge 
-                              bg={getStatusVariant(book.status)} 
-                              className="d-flex align-items-center justify-content-center"
-                              style={{ 
+                          <td className="py-3 px-4">
+                            <Badge
+                              bg={getStatusVariant(book.status)}
+                              className="d-flex align-items-center justify-content-center px-3 py-2 rounded-pill"
+                              style={{
                                 width: 'fit-content',
-                                padding: '8px 12px',
-                                borderRadius: '20px',
                                 fontSize: '12px'
                               }}
                             >
@@ -560,7 +538,7 @@ const BookList = () => {
                               {book.status}
                             </Badge>
                           </td>
-                          <td className="d-none d-lg-table-cell">
+                          <td className="py-3 px-4 d-none d-lg-table-cell">
                             <div className="d-flex align-items-center">
                               {book.shelfLocation ? (
                                 <>
@@ -572,31 +550,21 @@ const BookList = () => {
                               )}
                             </div>
                           </td>
-                          <td className="pe-4">
+                          <td className="py-3 pe-4">
                             <div className="d-flex gap-2">
-                              <Button 
+                              <Button
                                 variant="outline-primary"
-                                size="sm"
-                                className="d-flex align-items-center justify-content-center"
-                                style={{ 
-                                  borderRadius: '8px',
-                                  width: '36px',
-                                  height: '36px'
-                                }}
+                                className="btn-icon"
                                 onClick={() => handleBookModalShow('edit', book)}
+                                title="Edit Book"
                               >
                                 <PencilSquare size={14} />
                               </Button>
-                              <Button 
+                              <Button
                                 variant="outline-success"
-                                size="sm"
-                                className="d-flex align-items-center justify-content-center"
-                                style={{ 
-                                  borderRadius: '8px',
-                                  width: '36px',
-                                  height: '36px'
-                                }}
+                                className="btn-icon"
                                 onClick={() => handleBookCheckOut(book)}
+                                title="Check Out/Return"
                               >
                                 <ArrowLeftRight size={14} />
                               </Button>
@@ -616,9 +584,7 @@ const BookList = () => {
                       <p className="text-muted mb-0">Try adjusting your search filters</p>
                     </div>
                   )}
-                </div>
-              </Card.Body>
-            </Card>
+            </div>
 
             {/* Pagination */}
             {filteredBooks.length > itemsPerPage && (

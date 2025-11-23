@@ -8,7 +8,8 @@ import UserModal from './UserModal';
 import UserAPI from '../../api/user';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import CenteredLoader from '../commons/spinner/CenteredLoader';
+import PageHeader from '../commons/headers/PageHeader';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -152,36 +153,30 @@ const AdminUserManagement = () => {
   };
 
   if(loading) {
-    return <PulseDotLoader />
+    return <CenteredLoader message="Loading Users..." />
   }
 
   return (
-    <Container fluid className="p-4 bg-light min-vh-100">
+    <Container fluid className="container-page-fluid">
       {showAlert && (
         <Alert variant={alertVariant} className="mb-4" dismissible onClose={() => setShowAlert(false)}>
           {alertMessage}
         </Alert>
       )}
 
-      <Row className="mb-4">
-        <Col>
-          <div className="d-flex align-items-center justify-content-between">
-            <div>
-              <h2 className="mb-1">
-                <PersonBadge className="me-2" />
-                User Management
-              </h2>
-              <p className="text-muted mb-0">Manage user accounts and permissions</p>
-            </div>
-            <Button variant="primary" size="lg" onClick={() => handleUserModalShow('add', {})}>
-              <PersonPlus className="me-2" />
-              Create User
-            </Button>
-          </div>
-        </Col>
-      </Row>
+      <PageHeader
+        icon={<PersonBadge size={32} />}
+        title="User Management"
+        subtitle="Manage user accounts and permissions"
+        actionButton={
+          <Button variant="primary" className="btn-modern" onClick={() => handleUserModalShow('add', {})}>
+            <PersonPlus className="me-2" />
+            Create User
+          </Button>
+        }
+      />
 
-      <Card className="shadow-sm mb-4">
+      <Card className="card-modern-glass mb-4">
         <Card.Body>
           <Row className="align-items-center">
             <Col md={6} className="mb-3 mb-md-0">
