@@ -13,6 +13,7 @@ const bookRoutes = require("./routes/book");
 const bookGenreRoutes = require('./routes/bookGenre');
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
+const dashboardRoutes = require("./routes/dashboard");
 
 const express = require("express");
 const app = express();
@@ -38,6 +39,9 @@ app.use('/api/bookGenre', validateRequest, requirePermission('library'), bookGen
 
 // Protected routes for users (Admin only)
 app.use("/api/user", validateRequest, requireAdmin, userRoutes);
+
+// Protected routes for dashboard (Admin only)
+app.use("/api/dashboard", validateRequest, requireAdmin, dashboardRoutes);
 
 // Public routes
 app.use("/api/auth", authRoutes);
