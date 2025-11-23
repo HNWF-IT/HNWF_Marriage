@@ -80,8 +80,8 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
   };
 
   return (
-    <Modal show={show} onHide={closeModal} size="lg" centered backdrop="static" onExited={onExited}>
-      <Modal.Header closeButton className={isCreateMode ? 'bg-primary text-white' : 'bg-warning text-white'} closeVariant="white">
+    <Modal show={show} onHide={closeModal} size="lg" centered backdrop="static" onExited={onExited} className="modal-modern">
+      <Modal.Header closeButton closeVariant="white">
         <Modal.Title>
           {isCreateMode ? <PersonPlus className="me-2" /> : <PencilSquare className="me-2" />}
           {isCreateMode ? 'Create New User' : 'Edit User'}
@@ -89,9 +89,9 @@ const UserModal = ({ mode, userData, show, handleClose, onExited, onUserAddOrUpd
       </Modal.Header>
 
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Modal.Body className="bg-light" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-          <div className="bg-white p-4 rounded shadow-sm">
-            <h5 className="mb-4" style={{ color: 'grey' }}>
+        <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <div className="modal-section">
+            <h5 className="modal-section-header">
               {isCreateMode ? 'Basic Information' : 'Update Information'}
             </h5>
             <Row>

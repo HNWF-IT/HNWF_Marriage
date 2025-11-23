@@ -98,22 +98,20 @@ const Login = () => {
       <Container style={{ position: 'relative', zIndex: 2 }}>
         <Row className="justify-content-center">
           <Col md={8} lg={6} xl={4}>
-            <Card 
-              className="shadow-lg border-0 overflow-hidden" 
+            <Card
+              className="glass-card overflow-hidden"
               style={{
-                borderRadius: '12px',
                 transform: isHovered ? 'scale(1.01)' : 'scale(1)',
                 transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease',
                 boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.15)' : '0 5px 15px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(5px)',
               }}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              {/* Green accent line at top of card */}
-              <div 
+              {/* Primary color accent line at top of card */}
+              <div
+                className="bg-gradient-primary"
                 style={{
-                  backgroundColor: '#3c6e30',
                   height: '4px',
                   width: '100%'
                 }}
@@ -158,25 +156,16 @@ const Login = () => {
                   </Alert>
                 )}
 
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit} className="form-glass">
                   <Form.Group className="mb-3">
                     <Form.Label className="small fw-medium">Email Address</Form.Label>
-                    <Form.Control 
-                      type="email" 
-                      placeholder="Enter your email" 
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      onFocus={() => setIsFocused({...isFocused, email: true})}
-                      onBlur={() => setIsFocused({...isFocused, email: false})}
                       disabled={isLoading}
                       style={{
-                        borderRadius: '6px',
-                        padding: '10px 12px',
-                        boxShadow: isFocused.email 
-                          ? '0 0 0 3px rgba(60, 110, 48, 0.25)' 
-                          : 'none',
-                        border: isFocused.email ? '1px solid #3c6e30' : '1px solid #ced4da',
-                        transition: 'all 0.2s ease-in-out',
                         opacity: isLoading ? 0.7 : 1
                       }}
                       required
@@ -185,22 +174,13 @@ const Login = () => {
 
                   <Form.Group className="mb-2">
                     <Form.Label className="small fw-medium">Password</Form.Label>
-                    <Form.Control 
-                      type="password" 
-                      placeholder="Enter your password" 
+                    <Form.Control
+                      type="password"
+                      placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      onFocus={() => setIsFocused({...isFocused, password: true})}
-                      onBlur={() => setIsFocused({...isFocused, password: false})}
                       disabled={isLoading}
                       style={{
-                        borderRadius: '6px',
-                        padding: '10px 12px',
-                        boxShadow: isFocused.password 
-                          ? '0 0 0 3px rgba(60, 110, 48, 0.25)' 
-                          : 'none',
-                        border: isFocused.password ? '1px solid #3c6e30' : '1px solid #ced4da',
-                        transition: 'all 0.2s ease-in-out',
                         opacity: isLoading ? 0.7 : 1
                       }}
                       required
@@ -235,26 +215,22 @@ const Login = () => {
                     </a>
                   </div>
 
-                  <Button 
-                    variant="success" 
-                    type="submit" 
-                    className="w-100 py-2 fw-medium d-flex align-items-center justify-content-center"
+                  <Button
+                    variant="success"
+                    type="submit"
+                    className="w-100 py-2 fw-medium d-flex align-items-center justify-content-center btn-modern bg-gradient-primary"
                     disabled={isLoading}
                     style={{
-                      backgroundColor: isLoading ? '#6c757d' : '#3c6e30',
                       border: 'none',
-                      borderRadius: '6px',
-                      transition: 'all 0.2s ease-in-out',
-                      boxShadow: isLoading ? 'none' : '0 2px 10px rgba(60, 110, 48, 0.3)',
                       position: 'relative',
                       overflow: 'hidden',
                       minHeight: '42px'
                     }}
                     onMouseEnter={(e) => {
-                      if (!isLoading) e.target.style.backgroundColor = '#2b5022'
+                      if (!isLoading) e.target.style.transform = 'translateY(-2px)'
                     }}
                     onMouseLeave={(e) => {
-                      if (!isLoading) e.target.style.backgroundColor = '#3c6e30'
+                      if (!isLoading) e.target.style.transform = 'translateY(0)'
                     }}
                     onMouseDown={(e) => {
                       if (!isLoading) {

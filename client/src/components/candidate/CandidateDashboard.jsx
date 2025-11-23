@@ -5,14 +5,14 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import CandidateModal from './CandidateModal';
 import CandidateAPI from '../../api/candidate';
 import { toast } from 'react-toastify';
-import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import CenteredLoader from '../commons/spinner/CenteredLoader';
 import { Education, Gender, MaritalStatus, MuslimStatus } from '../../enums/candidateEnums';
 import { calculateAge } from "../../utils/helper";
 import { Link } from 'react-router-dom';
-import { 
-  PeopleFill, 
-  HeartFill, 
-  PersonCheckFill, 
+import {
+  PeopleFill,
+  HeartFill,
+  PersonCheckFill,
   Search,
   Filter,
   PersonPlusFill,
@@ -24,6 +24,7 @@ import {
   ChevronRight
 } from 'react-bootstrap-icons';
 import StatsCardRow from '../commons/stats/StatsCardRow';
+import PageHeader from '../commons/headers/PageHeader';
 
 const CANDIDATES_PER_BATCH = 50;
 
@@ -197,7 +198,7 @@ const CandidateDashboard = () => {
   };
 
   if(loading) {
-    return <PulseDotLoader />
+    return <CenteredLoader message="Loading Candidates..." />
   }
 
   return (
@@ -210,38 +211,37 @@ const CandidateDashboard = () => {
         onCandidateAddOrUpdate={handleCandidateAddOrUpdate}
       /> : ""}
 
-      <Container fluid className="p-4 bg-light min-vh-100">
+      <Container fluid className="container-page-fluid">
         {/* Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0 fw-bold" style={{color: "#A49559"}}>
-            Candidate Dashboard
-          </h2>
-          <div className="d-flex gap-2">
-            <Button 
-              variant="success" 
-              onClick={() => handleShow('add', {})}
-              className="d-flex align-items-center"
-              size="sm"
-            >
-              <PersonPlusFill className="me-1" size={16} />
-              Add
-            </Button>
+        <PageHeader
+          title="Candidate Dashboard"
+          subtitle="Manage and view all candidate profiles"
+          actionButton={
+            <div className="d-flex gap-2">
+              <Button
+                variant="success"
+                onClick={() => handleShow('add', {})}
+                className="d-flex align-items-center btn-modern"
+              >
+                <PersonPlusFill className="me-2" size={18} />
+                Add Candidate
+              </Button>
 
-            <Button 
-              variant="outline-primary" 
-              onClick={() => setShowFilters(!showFilters)}
-              className="d-flex align-items-center"
-              size="sm"
-            >
-              <Filter className="me-1" size={16} />
-              Filters
-            </Button>
-          </div>
-        </div>
+              <Button
+                variant="outline-primary"
+                onClick={() => setShowFilters(!showFilters)}
+                className="d-flex align-items-center btn-modern"
+              >
+                <Filter className="me-2" size={18} />
+                Filters
+              </Button>
+            </div>
+          }
+        />
 
         {/* Advanced Filters */}
         <Collapse in={showFilters}>
-          <Card className="shadow-sm mb-4">
+          <Card className="card-modern-glass mb-4">
             <Card.Body>
               <h6 className="mb-3">Filter Options</h6>
               <Row className="g-3">
@@ -342,10 +342,10 @@ const CandidateDashboard = () => {
                 </Col>
                 
                 <Col xs={12}>
-                  <Button 
+                  <Button
                     variant="outline-secondary"
                     onClick={resetFilters}
-                    size="sm"
+                    className="btn-modern"
                   >
                     Reset Filters
                   </Button>
@@ -359,7 +359,7 @@ const CandidateDashboard = () => {
         <StatsCardRow stats={candidatesStats} />
         
         {/* Search and Filter Controls */}
-        <Card className="shadow-sm mb-4">
+        <Card className="card-modern-glass mb-4">
           <Card.Body>
             <Row className="align-items-center">
               <Col md={8} className="mb-3 mb-md-0">
@@ -396,166 +396,141 @@ const CandidateDashboard = () => {
         </Card>
 
         {/* Results Table */}
-        <Card className="shadow-sm">
+        <Card className="card-modern-glass">
           <Card.Body className="p-0">
             {filteredCandidates?.length > 0 ? (
               <>
                 <div className="table-responsive">
-                  <Table hover className="mb-0 align-middle" style={{ fontSize: '0.875rem', borderCollapse: 'separate', borderSpacing: '0' }}>
-                    <thead>
-                      <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                  <Table hover className="mb-0 align-middle table-borderless" style={{ fontSize: '0.875rem' }}>
+                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
+                      <tr>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Sr#
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Gender
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Age
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Marital Status
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Maslak
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Caste
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Qualification
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Health
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Location
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Muslim Status
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Status
                         </th>
-                        <th className="py-3 px-3 fw-semibold text-muted text-uppercase text-center" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        <th className="py-3 px-4 fw-semibold text-muted text-uppercase text-center" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                           Actions
                         </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredCandidates?.map((candidate, index) => ( 
-                        <tr 
-                          key={candidate._id} 
-                          className="border-bottom"
-                          style={{ 
-                            borderBottom: '1px solid #e9ecef'
+                      {filteredCandidates?.map((candidate, index) => (
+                        <tr
+                          key={candidate._id}
+                          style={{
+                            borderBottom: '1px solid #f0f0f0'
                           }}
                         >
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="fw-medium text-dark">
                               {((batch - 1) * 50) + index + 1}
                             </span>
                           </td>
-                          <td className="py-3 px-3">
-                            <Badge 
+                          <td className="py-3 px-4">
+                            <Badge
                               bg={candidate.gender === 'Male' ? 'primary' : 'danger'}
-                              className="px-3 py-1 rounded-pill"
+                              className="px-3 py-2 rounded-pill"
                               style={{ fontSize: '0.75rem', fontWeight: '500' }}
                             >
                               {candidate.gender}
                             </Badge>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="fw-medium">{calculateAge(candidate.dob)}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-dark">{candidate.maritalStatus}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-muted">{candidate.maslak}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-muted">{candidate.caste}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-dark">{candidate.qualification}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-muted">{candidate.healthCondition}</span>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <div className="d-flex align-items-center">
                               <GeoAltFill className="text-muted me-1" size={12} />
                               <span className="text-dark">{candidate.city}</span>
                             </div>
                           </td>
-                          <td className="py-3 px-3">
+                          <td className="py-3 px-4">
                             <span className="text-dark">{candidate.muslimStatus}</span>
                           </td>
-                          <td className="py-3 px-3">
-                            <Badge 
+                          <td className="py-3 px-4">
+                            <Badge
                               bg={
-                                candidate.willingStatus.toLowerCase() === 'seeking' ? 'success' : 
+                                candidate.willingStatus.toLowerCase() === 'seeking' ? 'success' :
                                 candidate.willingStatus.toLowerCase() === 'done' ? 'primary' : 'warning'
                               }
-                              className="px-3 py-1 rounded-pill"
+                              className="px-3 py-2 rounded-pill"
                               style={{ fontSize: '0.75rem', fontWeight: '500' }}
                             >
                               {candidate.willingStatus}
                             </Badge>
                           </td>
-                          
-                          <td className="py-3 px-3">
+
+                          <td className="py-3 px-4">
                             <div className="d-flex gap-1 justify-content-center">
-                              <Button 
+                              <Button
                                 variant="outline-primary"
-                                size="sm"
                                 onClick={() => handleShow('edit', candidate)}
                                 title="Edit"
-                                className="border-0 p-1"
-                                style={{ 
-                                  width: '32px', 
-                                  height: '32px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
+                                className="btn-icon"
                               >
-                                <PencilSquare size={12} />
+                                <PencilSquare size={14} />
                               </Button>
 
                               <Button
                                 variant="outline-success"
-                                size="sm"
                                 onClick={() => handleWillingnessChange(candidate._id, "Done")}
                                 title="Mark as Done"
-                                className="border-0 p-1"
-                                style={{ 
-                                  width: '32px', 
-                                  height: '32px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
+                                className="btn-icon"
                               >
-                                <CheckCircleFill size={12} />
+                                <CheckCircleFill size={14} />
                               </Button>
 
                               <Link to={`/candidates/${candidate._id}`}>
-                                <Button 
-                                  variant="outline-info" 
-                                  size="sm"
+                                <Button
+                                  variant="outline-primary"
                                   title="View Details"
-                                  className="border-0 p-1"
-                                  style={{ 
-                                    width: '32px', 
-                                    height: '32px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
+                                  className="btn-icon"
                                 >
-                                  <ThreeDotsVertical size={12} />
+                                  <ThreeDotsVertical size={14} />
                                 </Button>
                               </Link>
                             </div>
@@ -574,13 +549,13 @@ const CandidateDashboard = () => {
                         variant="outline-primary"
                         onClick={handlePrevBatch}
                         disabled={batch === 1}
-                        size="sm"
+                        className="btn-modern"
                       >
-                        <ChevronLeft size={16} />
+                        <ChevronLeft size={16} className="me-1" />
                         Previous
                       </Button>
                     </Col>
-                    
+
                     <Col xs={4} className="text-center">
                       <span className="text-muted fw-medium">
                         Page {batch} of {totalBatches}
@@ -592,10 +567,10 @@ const CandidateDashboard = () => {
                         variant="outline-primary"
                         onClick={handleNextBatch}
                         disabled={batch === totalBatches}
-                        size="sm"
+                        className="btn-modern"
                       >
                         Next
-                        <ChevronRight size={16} />
+                        <ChevronRight size={16} className="ms-1" />
                       </Button>
                     </Col>
                   </Row>

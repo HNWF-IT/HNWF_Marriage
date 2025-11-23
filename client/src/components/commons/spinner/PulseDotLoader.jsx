@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PulseDotLoader = ({ message = "Loading Data...", colors = ['#ff4d4d', '#4d79ff', '#4dff4d', '#ff4dff'] }) => {
+const PulseDotLoader = ({ message = "Loading Data...", colors = ['#d4af37', '#c9a961', '#bea38b', '#b39daa'] }) => {
   return (
     <div className="pulse-loader-container">
       <div className="pulse-dots-container">

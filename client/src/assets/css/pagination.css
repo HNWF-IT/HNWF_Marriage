@@ -1,14 +1,18 @@
-/* Modern Minimal Pagination Design */
+/* Modern Minimal Pagination Design - GPU Accelerated */
 .modern-pagination {
   gap: 12px;
   padding: 0;
   justify-content: center;
   align-items: center;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .modern-pagination .page-item {
   border: none;
   margin: 0;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .modern-pagination .page-link {
@@ -18,7 +22,12 @@
   padding: 0;
   font-weight: 500;
   font-size: 0.9rem;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .modern-pagination .page-link:focus {
@@ -41,6 +50,7 @@
 .pagination-number .page-link:hover {
   background: #e2e8f0;
   color: #334155;
+  transform: translateY(-2px) translateZ(0);
 }
 
 .pagination-number.active .page-link {
@@ -66,6 +76,8 @@
   background: #6366f1;
   color: #fff;
   border-color: #6366f1;
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
 .pagination-arrow.disabled .page-link {

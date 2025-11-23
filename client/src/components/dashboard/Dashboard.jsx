@@ -3,8 +3,9 @@ import { Card, Col, Container, Row, Badge, Button } from 'react-bootstrap';
 import { PeopleFill, HeartFill, PersonCheckFill, Book, CollectionFill, PersonBadge, TrophyFill, ClockHistory, CheckCircleFill, GenderMale, GenderFemale, Telephone, GeoAlt, EnvelopeFill } from 'react-bootstrap-icons';
 import DashboardAPI from '../../api/dashboard';
 import { toast } from 'react-toastify';
-import PulseDotLoader from '../commons/spinner/PulseDotLoader';
+import CenteredLoader from '../commons/spinner/CenteredLoader';
 import StatsCardRow from '../commons/stats/StatsCardRow';
+import SectionHeader from '../commons/headers/SectionHeader';
 import { calculateAge } from '../../utils/helper';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,7 +51,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <PulseDotLoader />;
+    return <CenteredLoader message="Loading Dashboard..." />;
   }
 
   // Marriage Statistics
@@ -116,7 +117,7 @@ const Dashboard = () => {
 
     return (
       <Card
-        className="mb-2 border-0 shadow-sm"
+        className="mb-2 glass-card-light"
         key={candidate._id}
         style={{ cursor: 'pointer', transition: 'all 0.2s' }}
         onClick={() => navigate(`/candidates/${candidate._id}`)}
@@ -132,13 +133,13 @@ const Dashboard = () => {
                 </span>
                 <Badge
                   bg={candidate.gender === 'Male' ? 'primary' : 'danger'}
-                  className="px-2 py-1"
+                  className="px-3 py-2 rounded-pill"
                   style={{ fontSize: '0.65rem' }}
                 >
                   {candidate.gender === 'Male' ? <GenderMale size={10} /> : <GenderFemale size={10} />}
                 </Badge>
               </div>
-              <div className="d-flex align-items-center gap-2" style={{ fontSize: '0.75rem' }}>
+              <div className="d-flex align-items-center gap-2 fs-sm">
                 <span className="text-muted">{age} yrs</span>
                 {candidate.city && (
                   <>
@@ -150,10 +151,10 @@ const Dashboard = () => {
             </div>
             {showScore && candidate.priorityScore && (
               <div className="text-center ms-2" style={{ minWidth: '45px' }}>
-                <div className="fw-bold text-warning" style={{ fontSize: '0.95rem' }}>
+                <div className="fw-bold text-warning fs-md">
                   {candidate.priorityScore}
                 </div>
-                <div style={{ fontSize: '0.6rem', color: '#999' }}>score</div>
+                <div className="fs-xs text-muted">score</div>
               </div>
             )}
           </div>
@@ -168,14 +169,14 @@ const Dashboard = () => {
     const femaleAge = female.dob ? calculateAge(female.dob) : 'N/A';
 
     return (
-      <Card key={index} className="mb-3 border-0 shadow-sm">
+      <Card key={index} className="mb-3 glass-card-light">
         <Card.Body className="p-3">
           <div className="d-flex justify-content-between align-items-start mb-2">
             <div className="d-flex align-items-center gap-2">
               <TrophyFill className="text-warning" size={18} />
               <span className="fw-bold">Match #{index + 1}</span>
             </div>
-            <Badge bg="warning" className="px-3 py-2">
+            <Badge bg="warning" className="px-3 py-2 rounded-pill">
               Score: {matchScore}
             </Badge>
           </div>
@@ -183,15 +184,15 @@ const Dashboard = () => {
           <Row className="g-2">
             <Col xs={6}>
               <div
-                className="p-2 rounded border"
-                style={{ cursor: 'pointer', backgroundColor: '#e3f2fd' }}
+                className="glass-panel"
+                style={{ cursor: 'pointer' }}
                 onClick={() => navigate(`/candidates/${male._id}`)}
               >
                 <div className="d-flex align-items-center mb-1">
                   <GenderMale size={14} className="text-primary me-1" />
-                  <span className="fw-semibold" style={{ fontSize: '0.85rem' }}>{male.name}</span>
+                  <span className="fw-semibold fs-base">{male.name}</span>
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#666' }}>
+                <div className="fs-sm text-muted">
                   {maleAge} yrs • {male.city || 'N/A'}
                 </div>
               </div>
@@ -199,15 +200,15 @@ const Dashboard = () => {
 
             <Col xs={6}>
               <div
-                className="p-2 rounded border"
-                style={{ cursor: 'pointer', backgroundColor: '#fce4ec' }}
+                className="glass-panel"
+                style={{ cursor: 'pointer' }}
                 onClick={() => navigate(`/candidates/${female._id}`)}
               >
                 <div className="d-flex align-items-center mb-1">
                   <GenderFemale size={14} className="text-danger me-1" />
-                  <span className="fw-semibold" style={{ fontSize: '0.85rem' }}>{female.name}</span>
+                  <span className="fw-semibold fs-base">{female.name}</span>
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#666' }}>
+                <div className="fs-sm text-muted">
                   {femaleAge} yrs • {female.city || 'N/A'}
                 </div>
               </div>
@@ -217,22 +218,22 @@ const Dashboard = () => {
           {/* Compatibility indicators */}
           <div className="d-flex gap-1 mt-2 flex-wrap">
             {compatibility.sameCity && (
-              <Badge bg="success" className="px-2 py-1" style={{ fontSize: '0.65rem' }}>
+              <Badge bg="success" className="px-3 py-2 rounded-pill" style={{ fontSize: '0.65rem' }}>
                 <GeoAlt size={10} className="me-1" />Same City
               </Badge>
             )}
             {compatibility.sameCaste && (
-              <Badge bg="info" className="px-2 py-1" style={{ fontSize: '0.65rem' }}>
+              <Badge bg="info" className="px-3 py-2 rounded-pill" style={{ fontSize: '0.65rem' }}>
                 Same Caste
               </Badge>
             )}
             {compatibility.sameMaslak && (
-              <Badge bg="secondary" className="px-2 py-1" style={{ fontSize: '0.65rem' }}>
+              <Badge bg="secondary" className="px-3 py-2 rounded-pill" style={{ fontSize: '0.65rem' }}>
                 Same Maslak
               </Badge>
             )}
             {compatibility.ageDifference !== null && (
-              <Badge bg="light" text="dark" className="px-2 py-1" style={{ fontSize: '0.65rem' }}>
+              <Badge bg="light" text="dark" className="px-3 py-2 rounded-pill" style={{ fontSize: '0.65rem' }}>
                 Age diff: {Math.abs(compatibility.ageDifference)} yrs
               </Badge>
             )}
@@ -243,20 +244,22 @@ const Dashboard = () => {
   };
 
   return (
-    <Container fluid className="p-4" style={{ backgroundColor: '#f0f0f0', minHeight: '100vh' }}>
+    <Container fluid className="container-page-fluid">
       {/* Statistics Section - Compact Layout */}
-      <Row className="mb-4">
+      <Row className="section-spacing">
         <Col lg={7} className="mb-3 mb-lg-0">
-          <Card className="shadow-sm border-0 h-100">
-            <Card.Body className="p-3">
-              <h6 className="mb-3 fw-bold text-primary">
-                <HeartFill className="me-2" size={18} />
-                Marriage Statistics
-              </h6>
+          <Card className="card-modern-glass h-100">
+            <Card.Body className="p-4">
+              <SectionHeader
+                icon={<HeartFill size={18} />}
+                title="Marriage Statistics"
+                size="small"
+                className="mb-3"
+              />
               <Row className="g-2">
                 {marriageStats.map((stat, index) => (
                   <Col xs={6} md={3} key={index}>
-                    <div className="text-center p-2 rounded" style={{ backgroundColor: stat.bgColor }}>
+                    <div className="stat-card-glass text-center">
                       <div className={stat.textColor} style={{ fontSize: '0.7rem', fontWeight: '600' }}>
                         {stat.label}
                       </div>
@@ -272,16 +275,18 @@ const Dashboard = () => {
         </Col>
 
         <Col lg={5}>
-          <Card className="shadow-sm border-0 h-100">
-            <Card.Body className="p-3">
-              <h6 className="mb-3 fw-bold text-info">
-                <Book className="me-2" size={18} />
-                Library Statistics
-              </h6>
+          <Card className="card-modern-glass h-100">
+            <Card.Body className="p-4">
+              <SectionHeader
+                icon={<Book size={18} />}
+                title="Library Statistics"
+                size="small"
+                className="mb-3"
+              />
               <Row className="g-2">
                 {libraryStats.map((stat, index) => (
                   <Col xs={4} key={index}>
-                    <div className="text-center p-2 rounded" style={{ backgroundColor: stat.bgColor }}>
+                    <div className="stat-card-glass text-center">
                       <div className={stat.textColor} style={{ fontSize: '0.7rem', fontWeight: '600' }}>
                         {stat.label}
                       </div>
@@ -298,16 +303,16 @@ const Dashboard = () => {
       </Row>
 
       {/* Candidate Lists */}
-      <Row className="mb-4">
+      <Row className="section-spacing">
         <Col lg={6} className="mb-4 mb-lg-0">
-          <Card className="shadow-sm h-100">
+          <Card className="card-modern-glass h-100">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <Card.Title className="mb-0">
                   <ClockHistory className="me-2" />
                   Upcoming Marriages
                 </Card.Title>
-                <Button variant="outline-primary" size="sm" onClick={() => navigate('/marriage')}>
+                <Button variant="outline-primary" className="btn-modern" onClick={() => navigate('/marriage')}>
                   View All
                 </Button>
               </div>
@@ -326,14 +331,14 @@ const Dashboard = () => {
         </Col>
 
         <Col lg={6}>
-          <Card className="shadow-sm h-100">
+          <Card className="card-modern-glass h-100">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <Card.Title className="mb-0">
                   <TrophyFill className="me-2" />
                   Top Matches
                 </Card.Title>
-                <Button variant="outline-warning" size="sm" onClick={() => navigate('/marriage')}>
+                <Button variant="outline-primary" className="btn-modern" onClick={() => navigate('/marriage')}>
                   View All
                 </Button>
               </div>
@@ -354,14 +359,14 @@ const Dashboard = () => {
 
       <Row>
         <Col md={12}>
-          <Card className="shadow-sm">
+          <Card className="card-modern-glass">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <Card.Title className="mb-0">
                   <CheckCircleFill className="me-2" />
                   Conducted Marriages
                 </Card.Title>
-                <Button variant="outline-success" size="sm" onClick={() => navigate('/marriage')}>
+                <Button variant="outline-primary" className="btn-modern" onClick={() => navigate('/marriage')}>
                   View All
                 </Button>
               </div>
