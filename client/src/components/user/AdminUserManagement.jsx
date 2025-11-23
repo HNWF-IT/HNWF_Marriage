@@ -116,6 +116,41 @@ const AdminUserManagement = () => {
     }
   };
 
+  const handleResetPassword = async (user) => {
+    const { value: newPassword } = await Swal.fire({
+      title: 'Reset Password',
+      text: `Enter new password for ${user.fullname}`,
+      input: 'password',
+      inputPlaceholder: 'Enter new password',
+      inputAttributes: {
+        minlength: 6,
+        autocomplete: 'new-password'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Reset',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Password is required!';
+        }
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters!';
+        }
+      }
+    });
+
+    if (newPassword) {
+      try {
+        await UserAPI.resetPassword(user._id, newPassword);
+        toast.success('Password reset successfully!');
+      } catch (err) {
+        const message = err?.response?.data?.message || 'Failed to reset password';
+        toast.error(message);
+      }
+    }
+  };
+
   if(loading) {
     return <PulseDotLoader />
   }
@@ -187,6 +222,7 @@ const AdminUserManagement = () => {
         users={filteredUsers}
         onUserModalShow={handleUserModalShow}
         onStatusToggle={handleStatusToggle}
+        onResetPassword={handleResetPassword}
       />
 
       <UserModal

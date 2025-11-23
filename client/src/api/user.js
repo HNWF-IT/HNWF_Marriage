@@ -7,6 +7,7 @@ const UserAPI = {
   updateUser: (id, data) => axiosInstance.put(`/user/update/${id}`, data),
   deleteUser: (id) => axiosInstance.delete(`/user/${id}`),
   updateUserStatus: (userId, status) => axiosInstance.patch(`/user/status/${userId}`, { status }),
+  resetPassword: (userId, newPassword) => axiosInstance.patch(`/user/reset-password/${userId}`, { newPassword }),
 };
 
 export default UserAPI;
